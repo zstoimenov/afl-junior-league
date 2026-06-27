@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'afl-shell-v2';
+const SHELL_CACHE = 'afl-shell-v3';
 const DATA_CACHE  = 'afl-data-v1';
 
 const SHELL_ASSETS = [
