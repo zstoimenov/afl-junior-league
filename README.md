@@ -214,3 +214,36 @@ A running summary of what's been built. Newest at the bottom.
 - Whole **English side** and whole **Bulgarian side** gated behind a password each (landing stays open).
 - Passwords are word + two-digit number + word, entered **case-insensitively**; only **SHA-256 hashes** are stored (`scripts/auth.js`), never plaintext.
 - Unlock persists for the session (`sessionStorage`), per side.
+
+---
+
+## Future consideration — GitHub Actions deploy (hardened secrets)
+
+**Status:** not planned for now. Documented here as a deliberate decision so it can be picked up later.
+
+### Why it exists as an option
+
+The current password gate (Phase 4) is **client-side**: the SHA-256 hashes ship inside `scripts/auth.js`, which is served as static source. That is the right level for a private family app — it keeps casual visitors out — but it is **not a hardened secret**:
+
+- The hashes are visible to anyone who views source, and a short word + two-digit-number + word password is brute-forceable offline against a known hash.
+- The check runs in the browser, so it can be bypassed in dev tools regardless of the password.
+
+Moving the secret out of the committed source requires a **build step**, which the project currently does not have (Pages deploys the `/docs` folder as-is from `main`).
+
+### What a GitHub Actions deploy would involve
+
+1. **Switch Pages source** from "Deploy from branch (`main` / `/docs`)" to **GitHub Actions**.
+2. Add a workflow (`.github/workflows/deploy.yml`) that, on push to `main`:
+   - checks out the repo,
+   - injects the password hashes from **repository secrets** (e.g. `EN_HASH`, `BG_HASH`) into a generated config (replacing a placeholder in `auth.js`, or writing a small `auth-config.js`),
+   - uploads `/docs` as the Pages artifact and deploys it.
+3. Store the hashes as **encrypted repo secrets** (Settings → Secrets and variables → Actions). The plaintext passwords never enter the repo or the build logs; only the deployed artifact carries the hash.
+
+### Trade-offs
+
+- **Gains:** secrets live in encrypted GitHub config instead of committed source; rotating a password is a secret change + redeploy, no code commit; opens the door to other build-time niceties (asset hashing for cache-busting, minification, story/season manifest generation).
+- **Costs:** adds a build pipeline and a moving part to a currently dead-simple static deploy; a broken workflow blocks all deploys; still does **not** make the gate cryptographically strong on its own — the hash is in the shipped bundle either way. True server-side enforcement would need an actual backend (e.g. a small auth function / edge worker), which is out of scope for a static PWA.
+
+### Recommendation
+
+Keep the static client-side gate while this is a private, low-stakes family app. Revisit the Actions deploy if/when the app is shared more widely, the passwords need to rotate often, or a build step is wanted for other reasons (cache-busting, minification). If stronger protection is ever required, the real answer is a lightweight backend, not just moving the hash.
