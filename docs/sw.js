@@ -1,52 +1,69 @@
-/* =========================================================
-   2027 AFL Kids Tracker — service worker (PWA shell).
-   Cache-first for the app shell so the tracker loads
-   instantly and works offline at the oval.
-   ========================================================= */
-
-const CACHE = 'afl-tracker-shell-v1';
+const SHELL_CACHE = 'afl-shell-v2';
+const DATA_CACHE  = 'afl-data-v1';
 
 const SHELL_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './styles/main.css',
+  './styles/fixtures.css',
   './scripts/app.js',
+  './scripts/fixtures.js',
   './icons/icon.svg',
   './icons/icon-maskable.svg',
 ];
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(SHELL_ASSETS)).then(() => self.skipWaiting())
+    caches.open(SHELL_CACHE)
+      .then(c => c.addAll(SHELL_ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(k => k !== SHELL_CACHE && k !== DATA_CACHE)
+          .map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request)
-        .then((response) => {
-          // Cache same-origin successful responses for offline reuse.
-          if (response.ok && new URL(request.url).origin === self.location.origin) {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
+  const url = new URL(request.url);
+  const isData = url.pathname.includes('/data/');
+
+  if (isData) {
+    // Network-first for JSON data: always try to get fresh, fall back to cache
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response.ok) {
+            caches.open(DATA_CACHE).then(c => c.put(request, response.clone()));
           }
           return response;
         })
-        .catch(() => cached);
-    })
-  );
+        .catch(() => caches.match(request))
+    );
+  } else {
+    // Cache-first for app shell
+    event.respondWith(
+      caches.match(request).then(cached => {
+        if (cached) return cached;
+        return fetch(request).then(response => {
+          if (response.ok && url.origin === self.location.origin) {
+            caches.open(SHELL_CACHE).then(c => c.put(request, response.clone()));
+          }
+          return response;
+        });
+      })
+    );
+  }
 });
