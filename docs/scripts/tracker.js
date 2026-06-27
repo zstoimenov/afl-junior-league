@@ -9,6 +9,21 @@ let G         = null;
 let _lang     = 'en';
 let _timerIv  = null;
 
+// Player identity comes from season-config.json (number may change each season).
+let _player   = { name: 'Alek', number: 13 };
+
+async function loadPlayerConfig() {
+  try {
+    const cfg = await fetch('./data/season-config.json').then(r => r.json());
+    if (cfg?.player) {
+      _player = {
+        name:   cfg.player.name   ?? _player.name,
+        number: cfg.player.number ?? _player.number,
+      };
+    }
+  } catch { /* keep defaults */ }
+}
+
 /* ---- helpers ---- */
 
 function calcTotal(s)  { return s.goals * 6 + s.behinds; }
@@ -300,7 +315,7 @@ function openQuarterNotes() {
             ${MOOD_EMOJI[m]}
           </button>`).join('')}
       </div>
-      <textarea class="notes-area" id="qnotes" placeholder="Notes on Alek's quarter…">${G.current.notes}</textarea>
+      <textarea class="notes-area" id="qnotes" placeholder="Notes on ${_player.name}'s quarter…">${G.current.notes}</textarea>
       <button class="sheet-primary" id="end-q-btn">${q >= 4 ? '🏁 FULL TIME' : `END Q${q} →`}</button>
       <button class="sheet-cancel" id="qnotes-cancel">CANCEL</button>
     </div>`;
@@ -362,7 +377,7 @@ function openFork(team, kind) {
       <div class="fork-hint">${kind === 'goal' ? '⚽ GOAL — WHO?' : 'BEHIND — WHO?'}</div>
       <div class="fork-btns">
         <button class="fork-btn fork-btn--alek" data-v="alek">
-          ALEK <span class="fork-pts">#13</span>
+          ${_player.name.toUpperCase()} <span class="fork-pts">#${_player.number}</span>
         </button>
         <button class="fork-btn" data-v="teammate">TEAMMATE</button>
       </div>
@@ -614,7 +629,7 @@ function showSummary() {
         <div class="debrief-card">
           <div class="debrief-field">
             <label class="debrief-label">✅ WHAT WENT WELL</label>
-            <textarea class="notes-area" id="debrief-well" placeholder="What Alek did well today…">${G.debrief?.didWell || ''}</textarea>
+            <textarea class="notes-area" id="debrief-well" placeholder="What ${_player.name} did well today…">${G.debrief?.didWell || ''}</textarea>
           </div>
           <div class="debrief-field">
             <label class="debrief-label">🎯 WORK ON</label>
@@ -678,6 +693,8 @@ export async function renderTracker(lang, round) {
 
   const app   = document.getElementById('app');
   const today = new Date().toISOString().split('T')[0];
+
+  await loadPlayerConfig();
 
   let info = { round: round || null, opponent: 'Opponent', homeAway: 'home', season: BASE_SEASON };
   try {
@@ -768,7 +785,7 @@ export async function renderTracker(lang, round) {
       </section>
 
       <div class="alek-strip">
-        <span class="alek-strip__name">⭐ ALEK #13</span>
+        <span class="alek-strip__name">⭐ ${_player.name.toUpperCase()} #${_player.number}</span>
         <span class="alek-strip__stats" id="alek-stats">—</span>
       </div>
 
