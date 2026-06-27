@@ -33,12 +33,6 @@ function route() {
     renderTracker('en', seg ? parseInt(seg, 10) : null);
     return;
   }
-  if (hash.startsWith('/bg/tracker')) {
-    const seg = hash.split('/')[3];
-    renderTracker('bg', seg ? parseInt(seg, 10) : null);
-    return;
-  }
-
   if (hash.startsWith('/bg/story')) {
     const seg = hash.split('/')[3] || 'prologue';
     renderStory('bg', seg);
