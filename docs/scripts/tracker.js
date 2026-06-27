@@ -59,6 +59,7 @@ function initState(date, round, opponent, homeAway, season) {
     quarters: [],
     current:  freshQ(),
     log:      [],
+    debrief:  { didWell: '', workOn: '' },
   };
 }
 
@@ -139,15 +140,10 @@ function updateScore() {
 function updateAlekStrip() {
   const t = getTotals();
   const parts = [];
-  if (t.goals)           parts.push(`${t.goals}G`);
-  if (t.behinds)         parts.push(`${t.behinds}B`);
-  if (t.disposalsOk)     parts.push(`${t.disposalsOk}D`);
-  if (t.marksOk)         parts.push(`${t.marksOk}M`);
-  if (t.tacklesOk)       parts.push(`${t.tacklesOk}T`);
-  if (t.goalAttempts > t.goals + t.behinds) {
-    const misses = t.goalAttempts - t.goals - t.behinds;
-    parts.push(`${misses} miss`);
-  }
+  if (t.goals || t.behinds)  parts.push(`${t.goals}G ${t.behinds}B`);
+  if (t.disposals)           parts.push(`${t.disposalsOk}/${t.disposals}D`);
+  if (t.marks)               parts.push(`${t.marksOk}/${t.marks}M`);
+  if (t.tackles)             parts.push(`${t.tacklesOk}/${t.tackles}T`);
   setTxt('alek-stats', parts.length ? parts.join(' · ') : '—');
 }
 
@@ -206,9 +202,9 @@ function recordStat(stat, ok) {
 function recordScore(team, scorer, kind) {
   const side = team === 'hp' ? G.score.hp : G.score.opp;
   if (kind === 'goal') side.goals++; else side.behinds++;
-  if (team === 'hp') {
+  if (team === 'hp' && scorer === 'alek') {
     if (kind === 'goal') G.current.stats.goals++; else G.current.stats.behinds++;
-    if (scorer === 'alek') G.current.stats.goalAttempts++;
+    G.current.stats.goalAttempts++;
   }
   G.log.push({ type: 'score', team, scorer, kind });
   saveState();
@@ -230,9 +226,9 @@ function undoLast() {
     case 'score': {
       const side = last.team === 'hp' ? G.score.hp : G.score.opp;
       if (last.kind === 'goal') side.goals--; else side.behinds--;
-      if (last.team === 'hp') {
+      if (last.team === 'hp' && last.scorer === 'alek') {
         if (last.kind === 'goal') G.current.stats.goals--; else G.current.stats.behinds--;
-        if (last.scorer === 'alek') G.current.stats.goalAttempts--;
+        G.current.stats.goalAttempts--;
       }
       break;
     }
@@ -529,6 +525,10 @@ function buildExportJson() {
         opposition:  { goals: G.score.opp.goals, behinds: G.score.opp.behinds, score: oppT },
       },
     },
+    debrief: {
+      didWell: G.debrief?.didWell || '',
+      workOn:  G.debrief?.workOn  || '',
+    },
   };
 }
 
@@ -602,6 +602,16 @@ function showSummary() {
       </div>
 
       <div class="summary-stats">
+        <div class="debrief-card">
+          <div class="debrief-field">
+            <label class="debrief-label">✅ WHAT WENT WELL</label>
+            <textarea class="notes-area" id="debrief-well" placeholder="What Alek did well today…">${G.debrief?.didWell || ''}</textarea>
+          </div>
+          <div class="debrief-field">
+            <label class="debrief-label">🎯 WORK ON</label>
+            <textarea class="notes-area" id="debrief-work" placeholder="One thing to improve next game…">${G.debrief?.workOn || ''}</textarea>
+          </div>
+        </div>
         <div class="summary-stat-row">
           <span class="summary-stat-lbl">Disposals</span>
           <span class="summary-stat-val">${t.disposals} <em>${t.disposalsOk} ✓</em></span>
@@ -627,13 +637,28 @@ function showSummary() {
           <div class="game-export-card__hint">Add file → Create new file → paste</div>
           <button class="summary-copy-btn" id="sum-export">📋 COPY JSON</button>
         </div>
-        <button class="summary-done-btn" id="sum-done">BACK TO FIXTURES</button>
+        <div class="summary-footer__row">
+          <button class="summary-new-btn" id="sum-new">+ NEW GAME</button>
+          <button class="summary-done-btn" id="sum-done">FIXTURES</button>
+        </div>
       </div>
     </div>`;
 
   document.getElementById('sum-back').addEventListener('click', () => { window.location.hash = `#/${_lang}`; });
   document.getElementById('sum-done').addEventListener('click', () => { window.location.hash = `#/${_lang}`; });
   document.getElementById('sum-export').addEventListener('click', () => copyJson('sum-export'));
+
+  document.getElementById('debrief-well').addEventListener('input', e => {
+    G.debrief.didWell = e.target.value; saveState();
+  });
+  document.getElementById('debrief-work').addEventListener('input', e => {
+    G.debrief.workOn = e.target.value; saveState();
+  });
+
+  document.getElementById('sum-new').addEventListener('click', () => {
+    try { localStorage.removeItem(lsKey(G.date)); } catch { /**/ }
+    renderTracker(_lang, null);
+  });
 }
 
 /* ---- entry point ---- */
@@ -662,9 +687,12 @@ export async function renderTracker(lang, round) {
   const saved = loadState(today);
   if (saved) {
     G = saved;
-    if (!G.log)      G.log      = [];
-    if (!G.current)  G.current  = freshQ();
-    if (!G.quarters) G.quarters = [];
+    if (!G.log)                   G.log             = [];
+    if (!G.current)               G.current         = freshQ();
+    if (!G.quarters)              G.quarters        = [];
+    if (G.quarterDuration == null) G.quarterDuration = 900;
+    if (G.timerRemaining  == null) G.timerRemaining  = G.quarterDuration;
+    if (!G.debrief)               G.debrief         = { didWell: '', workOn: '' };
     if (G.status === 'done') { showSummary(); return; }
     resumeTimerIfNeeded();
   } else {
@@ -681,12 +709,12 @@ export async function renderTracker(lang, round) {
     <div class="screen tracker-screen">
 
       <div class="ctrl-bar">
-        <button class="ctrl-undo" id="undo-btn" disabled>↩ UNDO</button>
+        <button class="ctrl-back" id="back-btn">‹</button>
         <div class="ctrl-fixture">
           <span class="ctrl-fixture__rd">${rdLabel}</span>
           <span class="ctrl-fixture__opp">${oppShort}</span>
         </div>
-        <button class="ctrl-back" id="back-btn">‹</button>
+        <button class="ctrl-undo" id="undo-btn" disabled>↩ UNDO</button>
       </div>
 
       <div class="game-bar">
@@ -703,21 +731,21 @@ export async function renderTracker(lang, round) {
       </div>
 
       <section class="scoreboard">
-        <div class="scoreboard__side">
-          <div class="scoreboard__ha">${oppHA}</div>
-          <div class="scoreboard__name">${oppShort}</div>
-          <button class="scoreboard__btn" id="score-opp-btn">
-            <div class="scoreboard__pts" id="opp-pts">${calcTotal(G.score.opp)}</div>
-            <div class="scoreboard__gb"  id="opp-gb">${fmtGB(G.score.opp)}</div>
-          </button>
-        </div>
-        <div class="scoreboard__div">:</div>
         <div class="scoreboard__side scoreboard__side--hp">
           <div class="scoreboard__ha">${hpHA}</div>
           <div class="scoreboard__name">HP BLUE</div>
           <button class="scoreboard__btn scoreboard__btn--hp" id="score-hp-btn">
             <div class="scoreboard__pts" id="hp-pts">${calcTotal(G.score.hp)}</div>
             <div class="scoreboard__gb"  id="hp-gb">${fmtGB(G.score.hp)}</div>
+          </button>
+        </div>
+        <div class="scoreboard__div">:</div>
+        <div class="scoreboard__side scoreboard__side--opp">
+          <div class="scoreboard__ha">${oppHA}</div>
+          <div class="scoreboard__name">${oppShort}</div>
+          <button class="scoreboard__btn" id="score-opp-btn">
+            <div class="scoreboard__pts" id="opp-pts">${calcTotal(G.score.opp)}</div>
+            <div class="scoreboard__gb"  id="opp-gb">${fmtGB(G.score.opp)}</div>
           </button>
         </div>
       </section>
