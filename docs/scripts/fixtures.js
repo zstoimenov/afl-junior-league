@@ -20,7 +20,6 @@ function displayTime(str, lang) {
   const t = parseAWST(str);
   if (!t) return '';
   if (lang === 'bg') {
-    // AWST (UTC+8) → EEST (UTC+3): subtract 5 hours
     const h = (t.h - 5 + 24) % 24;
     return `${String(h).padStart(2, '0')}:${String(t.min).padStart(2, '0')}`;
   }
@@ -57,46 +56,6 @@ function gameState(round, today) {
   if (round.date === today) return 'today';
   if (round.date < today) return 'past';
   return 'upcoming';
-}
-
-/* ---- LocalStorage helpers ---- */
-
-function lsKey(type, season) { return `afl.${type}.${season}`; }
-
-function loadOverrides(season) {
-  try {
-    const results  = JSON.parse(localStorage.getItem(lsKey('results',  season)) || '{}');
-    const fixtures = JSON.parse(localStorage.getItem(lsKey('fixtures', season)) || '{}');
-    return { results, fixtures };
-  } catch { return { results: {}, fixtures: {} }; }
-}
-
-function saveResultOverride(season, round, result) {
-  try {
-    const key  = lsKey('results', season);
-    const data = JSON.parse(localStorage.getItem(key) || '{}');
-    data[round] = result;
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch { /* storage unavailable */ }
-}
-
-function saveFixtureOverride(season, round, fixture) {
-  try {
-    const key  = lsKey('fixtures', season);
-    const data = JSON.parse(localStorage.getItem(key) || '{}');
-    data[round] = fixture;
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch { /* storage unavailable */ }
-}
-
-function applyOverrides(rounds, season) {
-  const { results, fixtures } = loadOverrides(season);
-  return rounds.map(r => {
-    const out = { ...r };
-    if (results[r.round])  out.result = { ...r.result, ...results[r.round] };
-    if (fixtures[r.round]) Object.assign(out, fixtures[r.round]);
-    return out;
-  });
 }
 
 /* ---- English card ---- */
@@ -182,10 +141,10 @@ function scoreRow(round, lang, state) {
   const isEn = lang === 'en';
 
   if (!hasResult(round)) {
-    if (state === 'today') {
+    if (state === 'today' && isEn) {
       return `<div class="score-dash score-dash--track">
         <button class="card-track-btn" data-round="${round.round}" data-lang="${lang}">
-          ▶ ${isEn ? 'TRACK GAME' : 'ПРОСЛЕДИ'}
+          ▶ TRACK GAME
         </button>
       </div>`;
     }
@@ -229,7 +188,7 @@ function scoreRow(round, lang, state) {
 
 const STORY_ROUNDS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
-function buildCard(round, lang, today, editMode) {
+function buildCard(round, lang, today) {
   const state   = gameState(round, today);
   const classes = ['fixture-card'];
   if (state === 'today')     classes.push('fixture-card--today');
@@ -238,156 +197,16 @@ function buildCard(round, lang, today, editMode) {
 
   const inner = lang === 'bg' ? cardBg(round, state) : cardEn(round, state);
 
-  const editBtn = editMode
-    ? `<button class="card-edit-btn" data-round="${round.round}" aria-label="Edit round ${round.round}">✎</button>`
-    : '';
-
   const storyBtn = lang === 'bg' && (state === 'past' || (state === 'today' && hasResult(round))) && STORY_ROUNDS.has(round.round)
     ? `<button class="card-story-btn" data-round="${round.round}">📖 Прочети историята</button>`
     : '';
 
   return `
     <article class="${classes.join(' ')}" data-round="${round.round}" data-state="${state}">
-      ${editBtn}
       ${inner}
       ${scoreRow(round, lang, state)}
       ${storyBtn}
     </article>`;
-}
-
-/* ---- Edit modal (module-level state for cross-function access) ---- */
-
-let _editMeta = {};
-
-function openEditModal(round, lang, season, today, onSave) {
-  const state = gameState(round, today);
-  _editMeta = { round, lang, season, state, onSave };
-
-  const isEn     = lang === 'en';
-  const modal    = document.getElementById('edit-modal');
-  const isResult = state === 'past' || state === 'today';
-  const rdLabel  = isEn ? `Round ${round.round}` : `Кръг ${round.round}`;
-  const title    = isResult
-    ? (isEn ? 'Edit Result' : 'Резултат')
-    : (isEn ? 'Edit Fixture' : 'Редакция');
-
-  let formHtml;
-  if (isResult) {
-    const hp  = round.result?.hammondPark || { goals: 0, behinds: 0 };
-    const opp = round.result?.opposition  || { goals: 0, behinds: 0 };
-    const oppName = (opponent(round) || 'Opposition').substring(0, 14).toUpperCase();
-    formHtml = `
-      <div class="edit-score-grid">
-        <div class="edit-team">
-          <div class="edit-team__label">HP BLUE</div>
-          <div class="edit-score-inputs">
-            <label class="edit-score-lbl">${isEn ? 'Goals' : 'Гола'}
-              <input type="number" min="0" id="hp-goals" value="${hp.goals}">
-            </label>
-            <label class="edit-score-lbl">${isEn ? 'Behinds' : 'Зад'}
-              <input type="number" min="0" id="hp-behinds" value="${hp.behinds}">
-            </label>
-          </div>
-        </div>
-        <div class="edit-vs">vs</div>
-        <div class="edit-team">
-          <div class="edit-team__label">${oppName}</div>
-          <div class="edit-score-inputs">
-            <label class="edit-score-lbl">${isEn ? 'Goals' : 'Гола'}
-              <input type="number" min="0" id="opp-goals" value="${opp.goals}">
-            </label>
-            <label class="edit-score-lbl">${isEn ? 'Behinds' : 'Зад'}
-              <input type="number" min="0" id="opp-behinds" value="${opp.behinds}">
-            </label>
-          </div>
-        </div>
-      </div>`;
-  } else {
-    const oppVal = opponent(round) || '';
-    formHtml = `
-      <div class="edit-fixture-form">
-        <label class="edit-field">
-          <span>${isEn ? 'Date (YYYY-MM-DD)' : 'Дата (ГГГГ-ММ-ДД)'}</span>
-          <input type="text" id="fix-date" value="${round.date || ''}" placeholder="2026-08-01">
-        </label>
-        <label class="edit-field">
-          <span>${isEn ? 'Time AWST (e.g. 8:30 am)' : 'Час AWST (напр. 8:30 am)'}</span>
-          <input type="text" id="fix-time" value="${round.time || ''}" placeholder="8:30 am">
-        </label>
-        <label class="edit-field">
-          <span>${isEn ? 'Venue' : 'Стадион'}</span>
-          <input type="text" id="fix-ground" value="${round.ground || ''}" placeholder="Frankland Park">
-        </label>
-        <label class="edit-field">
-          <span>${isEn ? 'Opponent' : 'Противник'}</span>
-          <input type="text" id="fix-opponent" value="${oppVal}" placeholder="Team Name">
-        </label>
-        <label class="edit-field">
-          <span>${isEn ? 'Home / Away' : 'У дома / Гости'}</span>
-          <select id="fix-homeaway">
-            <option value="home" ${round.homeAway === 'home' ? 'selected' : ''}>${isEn ? 'Home' : 'У дома'}</option>
-            <option value="away" ${round.homeAway === 'away' ? 'selected' : ''}>${isEn ? 'Away' : 'На гости'}</option>
-          </select>
-        </label>
-      </div>`;
-  }
-
-  modal.innerHTML = `
-    <div class="edit-modal__backdrop" id="edit-backdrop"></div>
-    <div class="edit-modal__sheet" role="dialog" aria-modal="true">
-      <div class="edit-modal__header">
-        <span class="edit-modal__rd">${rdLabel}</span>
-        <h2 class="edit-modal__title">${title}</h2>
-        <button class="edit-modal__close" id="edit-close" aria-label="${isEn ? 'Close' : 'Затвори'}">✕</button>
-      </div>
-      <div class="edit-modal__body">${formHtml}</div>
-      <div class="edit-modal__footer">
-        <button class="edit-modal__save" id="edit-save">${isEn ? 'Save' : 'Запази'}</button>
-      </div>
-    </div>`;
-
-  modal.removeAttribute('hidden');
-  modal.querySelector('#edit-backdrop').addEventListener('click', closeEditModal);
-  modal.querySelector('#edit-close').addEventListener('click', closeEditModal);
-  modal.querySelector('#edit-save').addEventListener('click', commitEdit);
-}
-
-function closeEditModal() {
-  const modal = document.getElementById('edit-modal');
-  if (modal) modal.setAttribute('hidden', '');
-}
-
-function commitEdit() {
-  const { round, season, state, onSave } = _editMeta;
-
-  if (state === 'past' || state === 'today') {
-    const hpG  = parseInt(document.getElementById('hp-goals').value,    10) || 0;
-    const hpB  = parseInt(document.getElementById('hp-behinds').value,  10) || 0;
-    const oppG = parseInt(document.getElementById('opp-goals').value,   10) || 0;
-    const oppB = parseInt(document.getElementById('opp-behinds').value, 10) || 0;
-    const hpS  = hpG * 6 + hpB;
-    const oppS = oppG * 6 + oppB;
-    const winner = hpS > oppS ? 'hammondPark' : oppS > hpS ? 'opposition' : 'draw';
-    saveResultOverride(season, round.round, {
-      hammondPark: { goals: hpG, behinds: hpB, score: hpS },
-      opposition:  { goals: oppG, behinds: oppB, score: oppS },
-      winner,
-    });
-  } else {
-    const ha     = document.getElementById('fix-homeaway').value;
-    const oppVal = document.getElementById('fix-opponent').value.trim();
-    saveFixtureOverride(season, round.round, {
-      date:     document.getElementById('fix-date').value.trim(),
-      time:     document.getElementById('fix-time').value.trim(),
-      ground:   document.getElementById('fix-ground').value.trim(),
-      homeAway: ha,
-      homeTeam: ha === 'home' ? 'Hammond Park Blue' : oppVal,
-      awayTeam: ha === 'home' ? oppVal : 'Hammond Park Blue',
-    });
-  }
-
-  closeEditModal();
-  onSave?.();
 }
 
 /* ---- Screen entry point ---- */
@@ -405,8 +224,7 @@ export async function renderFixtures(lang) {
           <div class="screen-header__club">Hammond Park Blue</div>
           <h1 class="screen-header__title">${isEn ? 'Fixtures &amp; Results' : 'Мачове &amp; Резултати'}</h1>
         </div>
-        <button class="edit-toggle-btn" id="edit-toggle"
-          aria-label="${isEn ? 'Edit mode' : 'Редакция'}" aria-pressed="false">✎</button>
+        <div style="width:40px"></div>
       </header>
 
       <div class="year-bar">
@@ -420,28 +238,16 @@ export async function renderFixtures(lang) {
       <div class="fixtures-list" id="fixtures-list">
         <div class="screen-loading">${isEn ? 'Loading…' : 'Зарежда се…'}</div>
       </div>
-    </div>
-    <div class="edit-modal" id="edit-modal" hidden></div>`;
+    </div>`;
 
   document.getElementById('back-btn').addEventListener('click', () => {
     window.location.hash = '#/';
   });
 
   let selectedYear  = parseInt(today.slice(0, 4), 10);
-  let editMode      = false;
   let currentRounds = [];
-  let currentSeason = selectedYear;
 
-  function rerender() { loadAndRender(selectedYear); }
-
-  function attachEditListeners() {
-    document.querySelectorAll('.card-edit-btn').forEach(btn => {
-      const rnd = parseInt(btn.dataset.round, 10);
-      btn.addEventListener('click', () => {
-        const r = currentRounds.find(x => x.round === rnd);
-        if (r) openEditModal(r, lang, currentSeason, today, rerender);
-      });
-    });
+  function attachListeners() {
     document.querySelectorAll('.card-track-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         window.location.hash = `#/${btn.dataset.lang}/tracker/${btn.dataset.round}`;
@@ -472,8 +278,7 @@ export async function renderFixtures(lang) {
       if (!resp.ok) throw Object.assign(new Error(resp.statusText), { status: resp.status });
       const data = await resp.json();
 
-      currentSeason = data.season;
-      currentRounds = applyOverrides(data.rounds, currentSeason);
+      currentRounds = data.rounds;
 
       const prologueHtml = lang === 'bg' ? `
         <button class="prologue-card" id="prologue-card" type="button">
@@ -484,8 +289,8 @@ export async function renderFixtures(lang) {
           <span class="prologue-card__arrow">›</span>
         </button>` : '';
 
-      list.innerHTML = prologueHtml + currentRounds.map(r => buildCard(r, lang, today, editMode)).join('');
-      attachEditListeners();
+      list.innerHTML = prologueHtml + currentRounds.map(r => buildCard(r, lang, today)).join('');
+      attachListeners();
 
       const todayCard = list.querySelector('[data-state="today"]');
       if (todayCard) requestAnimationFrame(() =>
@@ -515,18 +320,6 @@ export async function renderFixtures(lang) {
   document.getElementById('year-next').addEventListener('click', () => {
     selectedYear++;
     loadAndRender(selectedYear);
-  });
-
-  document.getElementById('edit-toggle').addEventListener('click', () => {
-    editMode = !editMode;
-    const btn = document.getElementById('edit-toggle');
-    btn.setAttribute('aria-pressed', String(editMode));
-    btn.classList.toggle('edit-toggle-btn--active', editMode);
-    if (currentRounds.length) {
-      const list = document.getElementById('fixtures-list');
-      list.innerHTML = currentRounds.map(r => buildCard(r, lang, today, editMode)).join('');
-      attachEditListeners();
-    }
   });
 
   loadAndRender(selectedYear);

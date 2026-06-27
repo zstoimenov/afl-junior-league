@@ -48,14 +48,14 @@ body {
 .landing {
   min-height: 100dvh;
   padding:
-    calc(env(safe-area-inset-top, 0px) + 32px)
-    20px
-    calc(env(safe-area-inset-bottom, 0px) + 24px);
+    calc(env(safe-area-inset-top, 0px) + 40px)
+    24px
+    calc(env(safe-area-inset-bottom, 0px) + 28px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 28px;
+  gap: 32px;
 }
 
 .landing__brand {
@@ -63,112 +63,127 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 12px;
 }
 
 .landing__crest img {
   display: block;
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
 }
 
 .landing__title {
-  font-size: clamp(1.9rem, 8vw, 2.8rem);
-  font-weight: 800;
+  font-size: clamp(1.5rem, 6.5vw, 2.2rem);
+  font-weight: 900;
   letter-spacing: -0.02em;
   margin: 4px 0 0;
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 1.05;
 }
 
 .landing__subtitle {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--muted);
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.38);
   text-transform: uppercase;
 }
 
 /* ---------------- Flag buttons ---------------- */
 
 .flags {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
+  max-width: 420px;
 }
 
 .flag {
   appearance: none;
-  border: 3px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius);
   color: var(--white);
   font-family: inherit;
   cursor: pointer;
-  padding: 12px;
-  aspect-ratio: 1;
+  padding: 18px 22px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  gap: 18px;
+  text-align: left;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
   transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
 }
 
-.flag--en { background: linear-gradient(135deg, #009b48, var(--bg-au)); }
-.flag--bg { background: linear-gradient(135deg, #e23b2a, var(--bg-bg)); }
+.flag--en { background: linear-gradient(135deg, #0d8c44, #00843d); }
+.flag--bg { background: linear-gradient(135deg, #c03323, #d62612); }
 
 .flag:active {
-  transform: scale(0.97);
-  filter: brightness(1.05);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transform: scale(0.98);
+  filter: brightness(1.06);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
-.flag__emoji { font-size: 2.4rem; line-height: 1; }
+.flag__emoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.flag__body {
+  flex: 1;
+  min-width: 0;
+}
 
 .flag__label {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 800;
   letter-spacing: 0.01em;
+  display: block;
+  line-height: 1.2;
 }
 
-/* ---------------- Footer / status ---------------- */
+.flag__sublabel {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  margin-top: 3px;
+}
+
+.flag__arrow {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  line-height: 1;
+  font-weight: 300;
+}
+
+/* ---------------- Footer ---- */
 
 .landing__footer {
   text-align: center;
-  min-height: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
 }
 
 .landing__track-btn {
   appearance: none;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 20px;
-  color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.28);
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 8px 20px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background 0.1s;
+  transition: color 0.15s;
 }
 
-.landing__track-btn:active { background: rgba(255, 255, 255, 0.13); }
-
-.landing__status {
-  margin: 0;
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  color: var(--muted);
-}
+.landing__track-btn:active { color: rgba(255, 255, 255, 0.6); }
 
