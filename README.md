@@ -251,7 +251,7 @@ A running summary of what's been built. Newest at the bottom.
 
 ### Real 2026 data + tap-to-open
 - **Cards open on tap** (no buttons): EN played game → stats report, EN today → tracker, BG → story, with a short hint + chevron.
-- **Real game data for rounds 1–9** plugged in from the previous app: `games/game-2026-*.json` (totals + per-quarter), with coach Highlight/Focus → debrief and commentator Insight → `story-2026-*.json` (all 9 rounds have a write-up). Fixtures results now flow from these; corrected round 5 to away (HPFC Green).
+- **Real game data for rounds 1–9** plugged in from the previous app: `games/game-2026-*.json` (totals + per-quarter), with coach Highlight/Focus → debrief and commentator Insight → `story-2026-*.json` (all 9 rounds have a write-up). Fixtures results now flow from these; corrected round 5 to away (Hammond Park Green).
 
 ### Phase 7 — Season Arc
 - **Season screen** (`#/en/arc`, `#/bg/arc`): aggregates all game files live — record (8–1), goals/behinds/shots, marks/disposals/tackles with success %, season points (42) — then the **season arc** narrative (`stories/season-2026.json`, EN + BG). Added to both menus.
