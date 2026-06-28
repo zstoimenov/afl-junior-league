@@ -1,0 +1,73 @@
+{
+  "round": 3,
+  "date": "2026-05-09",
+  "opponent": "Jandakot",
+  "homeAway": "home",
+  "quarters": [
+    {
+      "quarter": 1,
+      "position": "fwd",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 1, "behinds": 0, "goalAttempts": 1 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 2, "successful": 2 },
+        "tackles": { "attempts": 1, "successful": 0 }
+      }
+    },
+    {
+      "quarter": 2,
+      "position": "def",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 3, "successful": 1 },
+        "tackles": { "attempts": 1, "successful": 1 }
+      }
+    },
+    {
+      "quarter": 3,
+      "position": "mid",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 5, "successful": 4 },
+        "tackles": { "attempts": 4, "successful": 4 }
+      }
+    },
+    {
+      "quarter": 4,
+      "position": "def",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 3, "successful": 2 },
+        "tackles": { "attempts": 3, "successful": 3 }
+      }
+    }
+  ],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 1, "behinds": 0, "goalAttempts": 1 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 13, "successful": 9 },
+      "tackles": { "attempts": 9, "successful": 8 },
+      "points": 6
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 12, "behinds": 5, "score": 77 },
+      "opposition": { "goals": 3, "behinds": 2, "score": 20 }
+    }
+  },
+  "debrief": {
+    "didWell": "Alek scored the first goal to put us on the scoreboard. He touched a ball going through the posts to prevent a goal for the opposition and only allowed them to score a point, instead of six. Great tackling throughout the match. He marked the ball a few times — great hands. He was selected for game of the match for his tackling and pressure throughout the game.",
+    "workOn": "He needs to keep practising passing the ball in dead game situations."
+  }
+}

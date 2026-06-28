@@ -310,6 +310,21 @@
   box-shadow: var(--hairline), var(--press);
 }
 
+.fixture-card__hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--green-accent);
+  opacity: 0.85;
+}
+
+.fixture-card__hint-arr { width: 13px; height: 13px; }
+
 /* TBD: faint, awaiting details */
 .fixture-card--tbd {
   background: rgba(255, 255, 255, 0.015);

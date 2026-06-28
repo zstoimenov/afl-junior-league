@@ -182,13 +182,6 @@ function scoreRow(round, lang, state) {
   const isEn = lang === 'en';
 
   if (!hasResult(round)) {
-    if (state === 'today' && isEn) {
-      return `<div class="score-dash score-dash--track">
-        <button class="card-track-btn" data-round="${round.round}" data-lang="${lang}">
-          ${icon('play')}<span>TRACK GAME</span>
-        </button>
-      </div>`;
-    }
     return `<div class="score-dash">— · —</div>`;
   }
 
@@ -257,6 +250,7 @@ function prologueShort(title) {
 
 function buildCard(round, lang, today, year, storyRounds, gameDates) {
   const state   = gameState(round, today);
+  const isEn    = lang === 'en';
   const classes = ['fixture-card'];
   if (state === 'today')     classes.push('fixture-card--today');
   else if (state === 'past') classes.push('fixture-card--past');
@@ -266,20 +260,33 @@ function buildCard(round, lang, today, year, storyRounds, gameDates) {
 
   const inner = lang === 'bg' ? cardBg(round, state) : cardEn(round, state);
 
-  // BG: read the narrative story. EN: open Alek's game stats + report.
-  const storyBtn = lang === 'bg' && (state === 'past' || (state === 'today' && hasResult(round))) && storyRounds.has(round.round)
-    ? `<button class="card-story-btn" data-round="${round.round}" data-year="${year}">${icon('stories')}<span>Прочети историята</span></button>`
-    : '';
+  // Tapping the whole card opens the relevant screen — no buttons.
+  let tap = '', hint = '';
+  const hasGame  = round.date && gameDates.has(round.date);
+  const hasStory = storyRounds.has(round.round);
+  if (isEn) {
+    if (hasGame && (state === 'past' || state === 'today')) {
+      tap = `report:${round.date}`;
+      hint = `Tap for Alek's stats &amp; report`;
+    } else if (state === 'today' && !hasResult(round)) {
+      tap = `tracker:${round.round}`;
+      hint = 'Tap to track this game';
+    }
+  } else if (hasStory && (state === 'past' || (state === 'today' && hasResult(round)))) {
+    tap = `story:${year}:${round.round}`;
+    hint = 'Натиснете, за да прочетете историята';
+  }
+  if (tap) classes.push('fixture-card--tappable');
 
-  const reportBtn = lang === 'en' && (state === 'past' || state === 'today') && round.date && gameDates.has(round.date)
-    ? `<button class="card-report-btn" data-date="${round.date}">${icon('reports')}<span>ALEK'S GAME</span></button>`
+  const hintHtml = hint
+    ? `<div class="fixture-card__hint">${hint} ${icon('chevron', 'fixture-card__hint-arr')}</div>`
     : '';
 
   return `
-    <article class="${classes.join(' ')}" data-round="${round.round}" data-state="${state}">
+    <article class="${classes.join(' ')}" data-round="${round.round}" data-state="${state}"${tap ? ` data-tap="${tap}"` : ''}>
       ${inner}
       ${scoreRow(round, lang, state)}
-      ${storyBtn}${reportBtn}
+      ${hintHtml}
     </article>`;
 }
 
@@ -325,30 +332,15 @@ export async function renderFixtures(lang) {
   let currentRounds = [];
 
   function attachListeners() {
-    document.querySelectorAll('.card-track-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        window.location.hash = `#/${btn.dataset.lang}/tracker/${btn.dataset.round}`;
-      });
-    });
-    // EN only: tapping today's fixture card opens the tracker, ready to start.
-    if (isEn) {
-      document.querySelectorAll('.fixture-card--today').forEach(card => {
-        card.classList.add('fixture-card--tappable');
-        card.addEventListener('click', () => {
-          window.location.hash = `#/en/tracker/${card.dataset.round}`;
-        });
-      });
-    }
-    document.querySelectorAll('.card-story-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        window.location.hash = `#/bg/story/${btn.dataset.year}/${btn.dataset.round}`;
-      });
-    });
-    document.querySelectorAll('.card-report-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        window.location.hash = `#/en/report/${btn.dataset.date}`;
+    // Whole-card tap → tracker / report / story, per the card's data-tap.
+    document.querySelectorAll('.fixture-card--tappable').forEach(card => {
+      card.addEventListener('click', () => {
+        const tap = card.dataset.tap;
+        if (!tap) return;
+        const [type, a, b] = tap.split(':');
+        if (type === 'report')       window.location.hash = `#/en/report/${a}`;
+        else if (type === 'tracker') window.location.hash = `#/en/tracker/${a}`;
+        else if (type === 'story')   window.location.hash = `#/bg/story/${a}/${b}`;
       });
     });
     const prologueCard = document.getElementById('prologue-card');

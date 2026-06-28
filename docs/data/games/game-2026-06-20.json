@@ -1,0 +1,73 @@
+{
+  "round": 8,
+  "date": "2026-06-20",
+  "opponent": "Fremantle City",
+  "homeAway": "home",
+  "quarters": [
+    {
+      "quarter": 1,
+      "position": "mid",
+      "mood": null,
+      "notes": "Alek played 4 minutes for Fremantle City at the start as they did not have enough players. Then switched back and sat on the bench. Came on for 7 minutes and played in the midfield. Solid tackling.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 3, "successful": 1 },
+        "tackles": { "attempts": 5, "successful": 3 }
+      }
+    },
+    {
+      "quarter": 2,
+      "position": "fwd",
+      "mood": null,
+      "notes": "Great tackle that led to the opposing player being called for holding the ball. Then scored a great goal from the free kick in front of goal.",
+      "aleksStats": {
+        "scoring": { "goals": 1, "behinds": 0, "goalAttempts": 1 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 1, "successful": 1 }
+      }
+    },
+    {
+      "quarter": 3,
+      "position": "def",
+      "mood": null,
+      "notes": "Good tackling in defence. Not much going on.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 5, "successful": 3 }
+      }
+    },
+    {
+      "quarter": 4,
+      "position": "mid",
+      "mood": null,
+      "notes": "Good tackling. He tackled a boy two times his size and three times his weight without fear. Got substituted in the middle of the quarter.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 2, "successful": 2 },
+        "tackles": { "attempts": 5, "successful": 2 }
+      }
+    }
+  ],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 1, "behinds": 0, "goalAttempts": 1 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 5, "successful": 3 },
+      "tackles": { "attempts": 16, "successful": 9 },
+      "points": 6
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 12, "behinds": 8, "score": 80 },
+      "opposition": { "goals": 4, "behinds": 2, "score": 26 }
+    }
+  },
+  "debrief": {
+    "didWell": "Solid game. Great tackling throughout the game. Good awareness of what is happening and where the ball is going.",
+    "workOn": "Stay focused on the game as it happens. Look for the ball when your teammates have it."
+  }
+}

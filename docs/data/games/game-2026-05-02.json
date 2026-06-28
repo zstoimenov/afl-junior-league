@@ -1,0 +1,24 @@
+{
+  "round": 2,
+  "date": "2026-05-02",
+  "opponent": "Kardinya",
+  "homeAway": "away",
+  "quarters": [],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 1, "behinds": 2, "goalAttempts": 6 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 0, "successful": 0 },
+      "tackles": { "attempts": 0, "successful": 0 },
+      "points": 8
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 18, "behinds": 14, "score": 122 },
+      "opposition": { "goals": 1, "behinds": 2, "score": 8 }
+    }
+  },
+  "debrief": {
+    "didWell": "Alek did a great specky (spectacular mark) in the first quarter which led to a goal for his team.",
+    "workOn": "Alek's kicks were a bit weak and inaccurate. More practice is needed in this area."
+  }
+}

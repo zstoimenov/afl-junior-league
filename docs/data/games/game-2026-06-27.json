@@ -1,0 +1,73 @@
+{
+  "round": 9,
+  "date": "2026-06-27",
+  "opponent": "Kwinana",
+  "homeAway": "away",
+  "quarters": [
+    {
+      "quarter": 1,
+      "position": "mid",
+      "mood": null,
+      "notes": "Great tackling in the middle of the field. Won a lot of balls and stopped the opposition plenty of times.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 6, "successful": 3 },
+        "tackles": { "attempts": 7, "successful": 6 }
+      }
+    },
+    {
+      "quarter": 2,
+      "position": "fwd",
+      "mood": null,
+      "notes": "He tried hard this quarter. He looked for the ball and put good pressure on the defence. He got substituted mid-way through.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 1, "successful": 1 }
+      }
+    },
+    {
+      "quarter": 3,
+      "position": "def",
+      "mood": null,
+      "notes": "He played with a lot of energy and desire to help his team. In the second half of the quarter, he pushed forward a bit to establish control of the field. Managed to stop the other team's pressure. Great work tactically.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 4, "successful": 3 },
+        "tackles": { "attempts": 3, "successful": 3 }
+      }
+    },
+    {
+      "quarter": 4,
+      "position": "def",
+      "mood": null,
+      "notes": "Did not have a lot to do this quarter.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 2, "successful": 1 }
+      }
+    }
+  ],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 10, "successful": 6 },
+      "tackles": { "attempts": 13, "successful": 11 },
+      "points": 0
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 15, "behinds": 13, "score": 103 },
+      "opposition": { "goals": 4, "behinds": 2, "score": 26 }
+    }
+  },
+  "debrief": {
+    "didWell": "Great energy through the whole game. Great tackling and desire to play.",
+    "workOn": "There is not much wrong, but catching the ball was not up to standard this game."
+  }
+}

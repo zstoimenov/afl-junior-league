@@ -61,10 +61,10 @@
       "round": 5,
       "date": "2026-05-23",
       "time": "8:30 am",
-      "homeTeam": "Hammond Park Blue",
-      "awayTeam": "HPFC Green",
+      "homeTeam": "HPFC Green",
+      "awayTeam": "Hammond Park Blue",
       "ground": "Frankland Park",
-      "homeAway": "home",
+      "homeAway": "away",
       "result": {
         "hammondPark": { "goals": 0, "behinds": 0, "score": 51 },
         "opposition": { "goals": 0, "behinds": 0, "score": 40 },

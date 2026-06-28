@@ -1,0 +1,21 @@
+{
+  "round": 1,
+  "date": "2026-04-25",
+  "opponent": "Cockburn",
+  "homeAway": "home",
+  "quarters": [],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 1 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 0, "successful": 0 },
+      "tackles": { "attempts": 0, "successful": 0 },
+      "points": 0
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 18, "behinds": 9, "score": 117 },
+      "opposition": { "goals": 2, "behinds": 0, "score": 12 }
+    }
+  },
+  "debrief": { "didWell": "", "workOn": "" }
+}

@@ -1,0 +1,73 @@
+{
+  "round": 4,
+  "date": "2026-05-15",
+  "opponent": "South Coogee",
+  "homeAway": "home",
+  "quarters": [
+    {
+      "quarter": 1,
+      "position": "mid",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 1, "behinds": 1, "goalAttempts": 2 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 4, "successful": 1 },
+        "tackles": { "attempts": 8, "successful": 4 }
+      }
+    },
+    {
+      "quarter": 2,
+      "position": "fwd",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 1, "behinds": 1, "goalAttempts": 2 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 1, "successful": 0 }
+      }
+    },
+    {
+      "quarter": 3,
+      "position": "def",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 4, "successful": 3 },
+        "tackles": { "attempts": 2, "successful": 3 }
+      }
+    },
+    {
+      "quarter": 4,
+      "position": "fwd",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 1, "successful": 0 }
+      }
+    }
+  ],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 2, "behinds": 2, "goalAttempts": 4 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 8, "successful": 4 },
+      "tackles": { "attempts": 12, "successful": 7 },
+      "points": 14
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 11, "behinds": 15, "score": 81 },
+      "opposition": { "goals": 5, "behinds": 3, "score": 33 }
+    }
+  },
+  "debrief": {
+    "didWell": "Great marks throughout the whole game. His two goals kept his team in the game early. He gave his team the courage they needed to keep fighting for the win. He got injured in the 4th quarter and had to leave the field for medical attention. He came back, and even with a bloody nose, he kept playing for the win.",
+    "workOn": "Alek was taking too long to pass the ball early in the game."
+  }
+}
