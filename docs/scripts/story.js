@@ -286,28 +286,37 @@ function statsBlock(game, isEn, player) {
   const oppName = (game.opponent || 'OPP').toUpperCase().substring(0, 12);
   const points  = a.points ?? ((sc.goals || 0) * 6 + (sc.behinds || 0));
 
-  const teamBlock = (name, t) =>
-    `<div class="rscore__team"><div class="rscore__name">${name}</div><div class="rscore__val">${t.goals || 0}.${t.behinds || 0} <em>(${t.score || 0})</em></div></div>`;
-  const hpBlock  = teamBlock('HP BLUE', hp);
-  const oppBlock = teamBlock(oppName, opp);
+  // Team result is dominant (total score big); goals.behinds is secondary.
+  const teamBlock = (name, t, hp) =>
+    `<div class="rscore__team${hp ? ' rscore__team--hp' : ''}">
+      <div class="rscore__name">${name}</div>
+      <div class="rscore__score">${t.score || 0}</div>
+      <div class="rscore__gb">${t.goals || 0}.${t.behinds || 0}</div>
+    </div>`;
+  const hpBlock  = teamBlock('HP BLUE', hp, true);
+  const oppBlock = teamBlock(oppName, opp, false);
 
-  const quarters = (game.quarters || []).map(q => {
-    const qa = q.aleksStats || {};
-    const bits = [
-      qa.scoring?.goals   && `${qa.scoring.goals}G`,
-      qa.scoring?.behinds && `${qa.scoring.behinds}B`,
-      qa.marks?.successful     && `${qa.marks.successful}M`,
-      qa.disposals?.successful && `${qa.disposals.successful}D`,
-      qa.tackles?.successful   && `${qa.tackles.successful}T`,
+  const qbits = qa => {
+    const xyq = o => (o?.attempts ? `${o.successful || 0}/${o.attempts}` : null);
+    return [
+      qa.scoring?.goals        && `${qa.scoring.goals}G`,
+      qa.scoring?.behinds      && `${qa.scoring.behinds}B`,
+      qa.scoring?.goalAttempts && `${qa.scoring.goalAttempts}sh`,
+      xyq(qa.marks)     && `${xyq(qa.marks)}M`,
+      xyq(qa.disposals) && `${xyq(qa.disposals)}D`,
+      xyq(qa.tackles)   && `${xyq(qa.tackles)}T`,
     ].filter(Boolean).join(' · ') || '—';
-    return `
+  };
+
+  const quarters = (game.quarters || []).map(q => `
       <div class="rquarter">
         <span class="rquarter__q">Q${q.quarter}</span>
         <span class="rquarter__mood">${q.mood ? icon(MOOD_ICON[q.mood]) : ''}</span>
         <span class="rquarter__pos">${POS_LBL_S[q.position] || ''}</span>
-        <span class="rquarter__stats">${bits}</span>
-      </div>`;
-  }).join('');
+        <span class="rquarter__stats">${qbits(q.aleksStats || {})}</span>
+      </div>`).join('');
+
+  const shotAcc = sc.goalAttempts ? `${Math.round((sc.goals || 0) / sc.goalAttempts * 100)}% ${isEn ? 'acc' : 'точ'}` : '';
 
   return `
     <div class="rscore">
@@ -321,10 +330,10 @@ function statsBlock(game, isEn, player) {
     <div class="rstat-grid">
       ${statTile('goal',     sc.goals || 0,        isEn ? 'Goals' : 'Голове')}
       ${statTile('behind',   sc.behinds || 0,      isEn ? 'Behinds' : 'Бихайнди')}
-      ${statTile('shot',     sc.goalAttempts || 0, isEn ? 'Shots' : 'Удари')}
-      ${statTile('mark',     xy(a.marks),          isEn ? 'Marks' : 'Маркове')}
-      ${statTile('disposal', xy(a.disposals),      isEn ? 'Disposals' : 'Подавания')}
-      ${statTile('tackle',   xy(a.tackles),        isEn ? 'Tackles' : 'Такъли')}
+      ${statTile('shot',     sc.goalAttempts || 0, isEn ? 'Shots' : 'Удари', shotAcc)}
+      ${statTile('mark',     xy(a.marks),          isEn ? 'Marks' : 'Маркове',    pct(a.marks?.successful, a.marks?.attempts))}
+      ${statTile('disposal', xy(a.disposals),      isEn ? 'Disposals' : 'Подавания', pct(a.disposals?.successful, a.disposals?.attempts))}
+      ${statTile('tackle',   xy(a.tackles),        isEn ? 'Tackles' : 'Такъли',   pct(a.tackles?.successful, a.tackles?.attempts))}
     </div>
 
     <div class="rpoints">
@@ -337,6 +346,83 @@ function statsBlock(game, isEn, player) {
       <div class="report-section__label">${isEn ? 'By quarter' : 'По четвъртини'}</div>
       <div class="rquarters">${quarters}</div>
     </div>` : ''}`;
+}
+
+// Score timeline — a margin "worm" of cumulative HP minus opposition points
+// across the game. Positive (above the line, green) = Hammond Park ahead;
+// negative (below, red) = behind. Vertical lines mark the quarter breaks.
+// Only rendered when the game carries a timestamped `events` stream.
+function timelineGraph(game, isEn) {
+  const events = (game.events || []).filter(
+    e => (e.points || 0) > 0 && (e.team === 'hammondPark' || e.team === 'opposition')
+  );
+  if (!events.length) return '';
+
+  const qDur  = game.quarterDuration || 900;
+  const numQ  = Math.max(4, game.quarters?.length || 0, ...events.map(e => e.quarter || 1));
+  const totalT = numQ * qDur;
+
+  const W = 320, H = 132, padY = 16;
+  const cy = H / 2;
+  const evX = e => (((e.quarter || 1) - 1) * qDur) + Math.min(e.time || 0, qDur);
+
+  const sorted = events.slice().sort((a, b) => evX(a) - evX(b));
+  let hpC = 0, opC = 0, maxAbs = 6;
+  const pts = [{ x: 0, m: 0 }];
+  sorted.forEach(e => {
+    const x = evX(e);
+    pts.push({ x, m: hpC - opC });                       // hold at the previous margin
+    if (e.team === 'hammondPark') hpC += e.points; else opC += e.points;
+    pts.push({ x, m: hpC - opC });                       // step to the new margin
+    maxAbs = Math.max(maxAbs, Math.abs(hpC - opC));
+  });
+  pts.push({ x: totalT, m: hpC - opC });
+
+  const sx = x => (x / totalT) * W;
+  const sy = m => cy - (m / maxAbs) * (cy - padY);
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${sx(p.x).toFixed(1)} ${sy(p.m).toFixed(1)}`).join(' ');
+  const area = `${line} L${W} ${cy} L0 ${cy} Z`;
+
+  const seps = [];
+  for (let q = 1; q < numQ; q++) {
+    const x = sx(q * qDur).toFixed(1);
+    seps.push(`<line x1="${x}" y1="0" x2="${x}" y2="${H}" class="tl__sep"/>`);
+  }
+
+  const qLabels = Array.from({ length: numQ }, (_, i) =>
+    `<span class="tl-axis__q">Q${i + 1}</span>`).join('');
+
+  const margin = hpC - opC;
+  const lead = margin > 0
+    ? (isEn ? `HP ahead by ${margin}` : `HP води с ${margin}`)
+    : margin < 0
+      ? (isEn ? `HP behind by ${-margin}` : `HP изостава с ${-margin}`)
+      : (isEn ? 'Scores level' : 'Равенство');
+
+  return `
+    <div class="report-section">
+      <div class="report-section__label">${isEn ? 'Score timeline' : 'Хронология на точките'}</div>
+      <div class="tl-wrap">
+        <svg class="tl" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"
+             aria-label="${isEn ? 'Score margin over the game' : 'Разлика в точките през мача'}">
+          <defs>
+            <clipPath id="tl-up"><rect x="0" y="0" width="${W}" height="${cy}"/></clipPath>
+            <clipPath id="tl-dn"><rect x="0" y="${cy}" width="${W}" height="${H - cy}"/></clipPath>
+          </defs>
+          ${seps.join('')}
+          <path d="${area}" class="tl__area tl__area--hp"  clip-path="url(#tl-up)"/>
+          <path d="${area}" class="tl__area tl__area--opp" clip-path="url(#tl-dn)"/>
+          <line x1="0" y1="${cy}" x2="${W}" y2="${cy}" class="tl__zero"/>
+          <path d="${line}" class="tl__worm"/>
+        </svg>
+        <div class="tl-axis">${qLabels}</div>
+        <div class="tl-legend">
+          <span class="tl-legend__item"><span class="tl-legend__swatch tl-legend__swatch--hp"></span>${isEn ? 'Hammond Park' : 'Hammond Park'}</span>
+          <span class="tl-legend__item"><span class="tl-legend__swatch tl-legend__swatch--opp"></span>${isEn ? 'Opposition' : 'Съперник'}</span>
+          <span class="tl-legend__lead">${lead}</span>
+        </div>
+      </div>
+    </div>`;
 }
 
 // A single game: stats + commentator + coach.
@@ -356,7 +442,8 @@ export async function renderReport(lang, date) {
   const story = isEn ? s?.english : s?.bulgarian;
   const round = s?.round ?? game?.round ?? '';
 
-  const statsHtml = game ? statsBlock(game, isEn, player) : '';
+  const statsHtml    = game ? statsBlock(game, isEn, player) : '';
+  const timelineHtml = game ? timelineGraph(game, isEn) : '';
 
   // Commentator comes from the story file; coach notes use the written story
   // coach if present, otherwise the game's own debrief (didWell / workOn).
@@ -392,9 +479,10 @@ export async function renderReport(lang, date) {
     <div class="story-content">
       <div class="report-meta">${round ? `${isEn ? 'Round' : 'Кръг'} ${round} · ` : ''}${date}</div>
       ${statsHtml}
+      ${timelineHtml}
+      ${coachHtml}
       ${headlineHtml}
       ${commentaryHtml}
-      ${coachHtml}
     </div>`;
 }
 

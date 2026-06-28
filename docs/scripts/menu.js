@@ -21,8 +21,12 @@ const PAGES = {
 };
 
 // Header markup for the menu, excluding the page you're on (currentKey).
-export function menuButtonHtml(lang, currentKey) {
+// `extras` are screen-specific action items (e.g. New Game on the tracker).
+export function menuButtonHtml(lang, currentKey, extras = []) {
   const items = (PAGES[lang] || []).filter(it => it.key !== currentKey);
+  const extraHtml = extras
+    .map(e => `<button class="header-menu__item header-menu__item--action" data-action="${e.action}">${icon(e.ic)}<span>${e.label}</span></button>`)
+    .join('');
   const links = items
     .map(it => `<button class="header-menu__item" data-href="${it.href}">${icon(it.ic)}<span>${it.label}</span></button>`)
     .join('');
@@ -30,12 +34,12 @@ export function menuButtonHtml(lang, currentKey) {
   return `
     <div class="header-menu-wrap">
       <button class="menu-btn" id="menu-btn" aria-label="${ariaLabel}" aria-expanded="false" aria-haspopup="true">${icon('menu')}</button>
-      <nav class="header-menu" id="header-menu" hidden>${links}</nav>
+      <nav class="header-menu" id="header-menu" hidden>${extraHtml}${links}</nav>
     </div>`;
 }
 
-// Wire open/close + navigation. Call after the header is in the DOM.
-export function attachMenu(lang) {
+// Wire open/close + navigation. onAction(actionName) handles extra items.
+export function attachMenu(lang, onAction) {
   const menuBtn = document.getElementById('menu-btn');
   const menuNav = document.getElementById('header-menu');
   if (!menuBtn || !menuNav) return;
@@ -58,8 +62,9 @@ export function attachMenu(lang) {
 
   menuNav.querySelectorAll('.header-menu__item').forEach(item => {
     item.addEventListener('click', () => {
-      const { href } = item.dataset;
+      const { href, action } = item.dataset;
       closeMenu();
+      if (action) { onAction?.(action); return; }
       if (href && href !== window.location.hash) window.location.hash = href;
     });
   });

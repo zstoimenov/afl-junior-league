@@ -247,20 +247,35 @@
 .rscore__team:last-child { text-align: right; }
 
 .rscore__name {
-  font-size: 0.56rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text-lo);
-  margin-bottom: 4px;
+  color: var(--text-mid);
+  margin-bottom: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.rscore__val { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.01em; color: var(--text-hi); }
-.rscore__val em { font-style: normal; font-size: 0.9rem; color: var(--text-mid); font-weight: 700; }
-.rscore__chip { flex-shrink: 0; font-size: 0.6rem !important; padding: 4px 10px !important; }
+/* Total score dominant; goals.behinds secondary */
+.rscore__score {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+}
+.rscore__team--hp .rscore__score { color: var(--green-accent); }
+.rscore__gb {
+  margin-top: 3px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-lo);
+  letter-spacing: 0.02em;
+}
+.rscore__chip { flex-shrink: 0; font-size: 0.62rem !important; padding: 5px 11px !important; }
 
 .rplayer {
   display: flex;
@@ -434,6 +449,89 @@
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.4);
   margin-bottom: 10px;
+}
+
+/* ---- Score timeline (margin worm) ---- */
+
+.tl-wrap {
+  background: var(--glass);
+  box-shadow: var(--hairline), var(--edge-top);
+  border-radius: 16px;
+  padding: 12px 12px 10px;
+}
+
+.tl {
+  display: block;
+  width: 100%;
+  height: 132px;
+}
+
+.tl__sep {
+  stroke: rgba(255, 255, 255, 0.10);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.tl__zero {
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1;
+}
+
+.tl__area--hp  { fill: rgba(34, 197, 94, 0.22); }
+.tl__area--opp { fill: rgba(239, 68, 68, 0.20); }
+
+.tl__worm {
+  fill: none;
+  stroke: var(--green-accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.tl-axis {
+  display: flex;
+  margin-top: 4px;
+}
+
+.tl-axis__q {
+  flex: 1;
+  text-align: center;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.tl-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+  padding-top: 9px;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-mid);
+}
+
+.tl-legend__item { display: inline-flex; align-items: center; gap: 5px; }
+
+.tl-legend__swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.tl-legend__swatch--hp  { background: rgba(34, 197, 94, 0.7); }
+.tl-legend__swatch--opp { background: rgba(239, 68, 68, 0.65); }
+
+.tl-legend__lead {
+  margin-left: auto;
+  font-weight: 800;
+  color: var(--text-hi);
+  letter-spacing: 0.02em;
 }
 
 .reports-empty {

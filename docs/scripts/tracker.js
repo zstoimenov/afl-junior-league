@@ -70,6 +70,7 @@ function initState(date, round, opponent, homeAway, season) {
     quarters: [],
     current:  freshQ(),
     log:      [],
+    events:   [],
     debrief:  { didWell: '', workOn: '' },
   };
 }
@@ -181,11 +182,11 @@ function updateGameBar() {
   const runBtn = document.getElementById('run-btn');
   if (runBtn) {
     runBtn.innerHTML = runBtnInner();
-    runBtn.classList.toggle('game-bar__run--live', G.status === 'running');
+    runBtn.classList.toggle('scoreboard__run--live', G.status === 'running');
   }
 
   const timerEl = document.getElementById('timer-display');
-  if (timerEl) timerEl.classList.toggle('game-bar__timer--edit', !G.gameStarted);
+  if (timerEl) timerEl.classList.toggle('scoreboard__clock--edit', !G.gameStarted);
 
   const undoBtn = document.getElementById('undo-btn');
   if (undoBtn) undoBtn.disabled = G.log.length === 0;
@@ -200,20 +201,42 @@ function fullUpdate() {
 
 /* ---- actions ---- */
 
+// Seconds elapsed since the start of the current quarter (timer counts down).
+function elapsedInQuarter() {
+  return Math.max(0, Math.round(G.quarterDuration - G.timerRemaining));
+}
+
+// Keep the Undo button's enabled state in sync after every recorded action.
+function refreshUndo() {
+  const b = document.getElementById('undo-btn');
+  if (b) b.disabled = G.log.length === 0;
+}
+
+// Record an action onto the undo log AND the timestamped event stream (1:1),
+// stamping each with the quarter and seconds-from-quarter-start.
+function logAction(logEntry, eventData) {
+  const q = G.quarter, t = elapsedInQuarter();
+  G.log.push({ ...logEntry, q, t });
+  if (!G.events) G.events = [];
+  G.events.push({ quarter: q, time: t, ...eventData });
+}
+
 function recordShotAttempt() {
   G.current.stats.goalAttempts++;
-  G.log.push({ type: 'shot' });
+  logAction({ type: 'shot' }, { action: 'shot', team: 'hammondPark', scorer: 'alek', points: 0 });
   saveState();
   updateAlekStrip();
+  refreshUndo();
 }
 
 function recordStat(stat, ok) {
   G.current.stats[stat]++;
   if (ok) G.current.stats[`${stat}Ok`]++;
-  G.log.push({ type: 'stat', stat, ok });
+  logAction({ type: 'stat', stat, ok }, { action: stat, ok, scorer: 'alek', points: 0 });
   saveState();
   updateStatBtns();
   updateAlekStrip();
+  refreshUndo();
 }
 
 function recordScore(team, scorer, kind) {
@@ -223,7 +246,10 @@ function recordScore(team, scorer, kind) {
     if (kind === 'goal') G.current.stats.goals++; else G.current.stats.behinds++;
     G.current.stats.goalAttempts++;
   }
-  G.log.push({ type: 'score', team, scorer, kind });
+  logAction(
+    { type: 'score', team, scorer, kind },
+    { action: kind, team: team === 'hp' ? 'hammondPark' : 'opposition', scorer, points: kind === 'goal' ? 6 : 1 }
+  );
   saveState();
   fullUpdate();
   vibe(kind === 'goal' ? [50, 30, 120, 30, 80] : [40, 30, 60]);
@@ -232,6 +258,7 @@ function recordScore(team, scorer, kind) {
 function undoLast() {
   const last = G.log.pop();
   if (!last) return;
+  if (G.events?.length) G.events.pop();   // log and events are pushed 1:1
   switch (last.type) {
     case 'shot':
       G.current.stats.goalAttempts--;
@@ -513,6 +540,7 @@ function buildExportJson() {
   return {
     date: G.date, round: G.round, season: G.season,
     opponent: G.opponent, homeAway: G.homeAway,
+    quarterDuration: G.quarterDuration,
     quarters: allQ.map((q, i) => ({
       quarter:   i + 1,
       position:  q.position,
@@ -542,6 +570,15 @@ function buildExportJson() {
         opposition:  { goals: G.score.opp.goals, behinds: G.score.opp.behinds, score: oppT },
       },
     },
+    events: (G.events || []).map(e => ({
+      quarter: e.quarter,
+      time:    e.time,
+      action:  e.action,
+      ...(e.team   != null ? { team: e.team }     : {}),
+      ...(e.scorer != null ? { scorer: e.scorer } : {}),
+      ...(e.points != null ? { points: e.points } : {}),
+      ...(e.ok     != null ? { ok: e.ok }         : {}),
+    })),
     debrief: {
       didWell: G.debrief?.didWell || '',
       workOn:  G.debrief?.workOn  || '',
@@ -581,11 +618,13 @@ function showSummary() {
   // Home team always renders on the LEFT.
   const isHome  = G.homeAway === 'home';
   const hpTeam  = `
-    <div class="summary-team__name">HP BLUE</div>
-    <div class="summary-team__score">${hp.goals}.${hp.behinds} (${hpT})</div>`;
+    <div class="summary-team__name summary-team__name--hp">HP BLUE</div>
+    <div class="summary-team__total summary-team__total--hp">${hpT}</div>
+    <div class="summary-team__gb">${hp.goals}.${hp.behinds}</div>`;
   const oppTeam = `
     <div class="summary-team__name">${oppName}</div>
-    <div class="summary-team__score">${opp.goals}.${opp.behinds} (${oppT})</div>`;
+    <div class="summary-team__total">${oppT}</div>
+    <div class="summary-team__gb">${opp.goals}.${opp.behinds}</div>`;
   const leftTeam  = isHome ? hpTeam : oppTeam;
   const rightTeam = isHome ? oppTeam : hpTeam;
 
@@ -596,7 +635,7 @@ function showSummary() {
         <div class="tracker-header__info">
           <span class="tracker-header__rd">FULL TIME · ${fmtDate(G.date)}</span>
         </div>
-        ${menuButtonHtml(_lang, 'tracker')}
+        ${menuButtonHtml(_lang, 'tracker', TRACKER_MENU_EXTRAS)}
       </header>
 
       <div class="summary-scoreline">
@@ -670,7 +709,7 @@ function showSummary() {
     </div>`;
 
   document.getElementById('sum-back').addEventListener('click', () => { window.location.hash = `#/${_lang}`; });
-  attachMenu(_lang);
+  attachMenu(_lang, a => onTrackerMenuAction(_lang, a));
   document.getElementById('sum-done').addEventListener('click', () => { window.location.hash = `#/${_lang}`; });
   document.getElementById('sum-export').addEventListener('click', () => copyJson('sum-export'));
 
@@ -685,6 +724,22 @@ function showSummary() {
     try { localStorage.removeItem(lsKey(G.date)); } catch { /**/ }
     renderTracker(_lang, null);
   });
+}
+
+/* ---- new game (menu action, tracker only) ---- */
+
+const TRACKER_MENU_EXTRAS = [{ action: 'newgame', ic: 'play', label: 'New Game' }];
+
+function startNewGame(lang) {
+  const inProgress = G && G.gameStarted && G.status !== 'done';
+  if (inProgress && !confirm('Start a new game? This clears the game currently in progress.')) return;
+  if (_timerIv) { clearInterval(_timerIv); _timerIv = null; }
+  try { localStorage.removeItem(lsKey(G.date)); } catch { /**/ }
+  renderTracker(lang, null);
+}
+
+function onTrackerMenuAction(lang, action) {
+  if (action === 'newgame') startNewGame(lang);
 }
 
 /* ---- entry point ---- */
@@ -716,6 +771,7 @@ export async function renderTracker(lang, round) {
   if (saved) {
     G = saved;
     if (!G.log)                   G.log             = [];
+    if (!G.events)                G.events          = [];
     if (!G.current)               G.current         = freshQ();
     if (!G.quarters)              G.quarters        = [];
     if (G.quarterDuration == null) G.quarterDuration = 900;
@@ -767,30 +823,27 @@ export async function renderTracker(lang, round) {
           <span class="ctrl-fixture__opp">${oppShort}</span>
         </div>
         <button class="ctrl-undo" id="undo-btn" disabled>${icon('undo')}<span>UNDO</span></button>
-        ${menuButtonHtml(lang, 'tracker')}
-      </div>
-
-      <div class="game-bar">
-        <button class="game-bar__q" id="q-label">Q${G.quarter}</button>
-        <button class="game-bar__pos" id="pos-btn">
-          <span id="pos-label">${POS_LBL[String(G.current.position)] ?? '—'}</span>
-        </button>
-        <div class="game-bar__sep"></div>
-        <div class="game-bar__timer${!G.gameStarted ? ' game-bar__timer--edit' : ''}" id="timer-display">${fmtTimer(G.timerRemaining)}</div>
-        <div class="game-bar__sep"></div>
-        <button class="game-bar__run${G.status === 'running' ? ' game-bar__run--live' : ''}" id="run-btn">
-          ${runBtnInner()}
-        </button>
+        ${menuButtonHtml(lang, 'tracker', TRACKER_MENU_EXTRAS)}
       </div>
 
       <section class="scoreboard">
-        ${leftSide}
-        <div class="scoreboard__div">:</div>
-        ${rightSide}
+        <div class="scoreboard__top">
+          <button class="scoreboard__q" id="q-label">Q${G.quarter}</button>
+          <div class="scoreboard__clock${!G.gameStarted ? ' scoreboard__clock--edit' : ''}" id="timer-display">${fmtTimer(G.timerRemaining)}</div>
+          <button class="scoreboard__run${G.status === 'running' ? ' scoreboard__run--live' : ''}" id="run-btn">
+            ${runBtnInner()}
+          </button>
+        </div>
+        <div class="scoreboard__teams">
+          ${leftSide}
+          <div class="scoreboard__div">:</div>
+          ${rightSide}
+        </div>
       </section>
 
       <div class="alek-strip">
         <span class="alek-strip__name">${icon('star', 'alek-strip__star')} ${_player.name.toUpperCase()} #${_player.number}</span>
+        <button class="alek-strip__pos" id="pos-btn"><span id="pos-label">${POS_LBL[String(G.current.position)] ?? '—'}</span></button>
         <span class="alek-strip__stats" id="alek-stats">—</span>
       </div>
 
@@ -822,7 +875,7 @@ export async function renderTracker(lang, round) {
     window.location.hash = `#/${lang}`;
   });
 
-  attachMenu(lang);
+  attachMenu(lang, a => onTrackerMenuAction(lang, a));
 
   document.getElementById('undo-btn').addEventListener('click', undoLast);
   document.getElementById('pos-btn').addEventListener('click', cyclePosition);

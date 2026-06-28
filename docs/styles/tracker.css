@@ -103,135 +103,114 @@
   white-space: nowrap;
 }
 
-/* ---- Row 2: Game bar — card style ---- */
-
-.game-bar {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 12px;
-  margin: 8px 10px 0;
-  background: var(--glass);
-  -webkit-backdrop-filter: var(--blur);
-  backdrop-filter: var(--blur);
-  box-shadow: var(--hairline), var(--edge-top), var(--lift-sm);
-  border-radius: 16px;
-}
-
-.game-bar__q {
-  appearance: none;
-  background: rgba(34, 197, 94, 0.12);
-  border: none;
-  border-radius: 10px;
-  color: var(--green-accent);
-  font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  padding: 7px 12px;
-  cursor: pointer;
-  white-space: nowrap;
-  min-height: 38px;
-  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.30);
-  transition: transform var(--t), box-shadow var(--t);
-}
-
-.game-bar__q:active { transform: translateY(1px) scale(0.97); box-shadow: var(--press); }
-
-.game-bar__pos {
-  appearance: none;
-  background: var(--glass);
-  border: none;
-  border-radius: 9px;
-  color: var(--text-mid);
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  padding: 7px 10px;
-  cursor: pointer;
-  min-width: 44px;
-  min-height: 38px;
-  text-align: center;
-  box-shadow: var(--hairline);
-  transition: transform var(--t), color var(--t), box-shadow var(--t);
-}
-
-.game-bar__pos:active { transform: translateY(1px) scale(0.97); color: var(--green-accent); box-shadow: var(--press); }
-
-.game-bar__sep {
-  width: 1px;
-  align-self: stretch;
-  margin: 4px 0;
-  background: rgba(255, 255, 255, 0.10);
-  flex-shrink: 0;
-}
-
-.game-bar__timer {
-  flex: 1;
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: var(--text-hi);
-  font-variant-numeric: tabular-nums;
-  cursor: default;
-}
-
-.game-bar__timer--edit {
-  color: var(--green-accent);
-  cursor: pointer;
-  text-decoration: underline dotted rgba(34, 197, 94, 0.4);
-}
-
-.game-bar__run {
-  appearance: none;
-  background: rgba(34, 197, 94, 0.14);
-  border: none;
-  border-radius: 10px;
-  color: var(--green-accent);
-  font-family: inherit;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 12px;
-  cursor: pointer;
-  white-space: nowrap;
-  min-height: 38px;
-  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.32), var(--edge-top);
-  transition: transform var(--t), box-shadow var(--t), background var(--t);
-}
-
-.game-bar__run .icn { width: 16px; height: 16px; }
-
-.game-bar__run--live {
-  background: rgba(34, 197, 94, 0.24);
-  box-shadow: inset 0 0 0 1px var(--green-accent), 0 0 18px rgba(34, 197, 94, 0.28);
-}
-
-.game-bar__run:active { transform: translateY(1px) scale(0.97); box-shadow: var(--press); }
-
-/* ---- Scoreboard (dominant section) — card frame ---- */
+/* ---- Scoreboard (dominant section) — card frame with timer on top ---- */
 
 .scoreboard {
   position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
+  flex-direction: column;
+  gap: 6px;
   margin: 8px 10px;
-  padding: 10px 18px;
+  padding: 12px 16px 14px;
   background: var(--glass);
   -webkit-backdrop-filter: var(--blur);
   backdrop-filter: var(--blur);
   box-shadow: var(--hairline), var(--edge-top), var(--lift);
   border-radius: 20px;
+}
+
+/* Top row: quarter chip (left) · clock (centred, dominant) · run (right) */
+.scoreboard__top {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.scoreboard__q {
+  appearance: none;
+  justify-self: start;
+  background: rgba(34, 197, 94, 0.12);
+  border: none;
+  border-radius: 11px;
+  color: var(--green-accent);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  padding: 9px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 42px;
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.30);
+  transition: transform var(--t), box-shadow var(--t);
+}
+
+.scoreboard__q:active { transform: translateY(1px) scale(0.96); box-shadow: var(--press); }
+
+/* The clock — the largest element in the top row, dead centre */
+.scoreboard__clock {
+  justify-self: center;
+  text-align: center;
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+  padding: 0 4px;
+}
+
+.scoreboard__clock--edit {
+  color: var(--green-accent);
+  cursor: pointer;
+  text-decoration: underline dotted rgba(34, 197, 94, 0.45);
+  text-underline-offset: 5px;
+}
+
+.scoreboard__run {
+  appearance: none;
+  justify-self: end;
+  background: rgba(34, 197, 94, 0.14);
+  border: none;
+  border-radius: 11px;
+  color: var(--green-accent);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 42px;
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.32), var(--edge-top);
+  transition: transform var(--t), box-shadow var(--t), background var(--t);
+}
+
+.scoreboard__run .icn { width: 16px; height: 16px; }
+
+.scoreboard__run--live {
+  background: rgba(34, 197, 94, 0.24);
+  box-shadow: inset 0 0 0 1px var(--green-accent), 0 0 18px rgba(34, 197, 94, 0.28);
+}
+
+.scoreboard__run:active { transform: translateY(1px) scale(0.97); box-shadow: var(--press); }
+
+/* Teams row — fills the remaining height, scores dominate */
+.scoreboard__teams {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
 }
 
 .scoreboard__hint {
@@ -288,16 +267,19 @@
 }
 
 .scoreboard__name {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  font-size: clamp(0.92rem, 4.2vw, 1.18rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.82);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  line-height: 1.05;
 }
+
+.scoreboard__side--hp .scoreboard__name { color: var(--green-accent); }
 
 .scoreboard__btn {
   appearance: none;
@@ -329,7 +311,7 @@
 }
 
 .scoreboard__pts {
-  font-size: clamp(3.8rem, 16vw, 6.5rem);
+  font-size: clamp(3.4rem, 15vw, 6rem);
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -388,6 +370,28 @@
 }
 
 .alek-strip__star { width: 15px; height: 15px; color: var(--green-accent); }
+
+.alek-strip__pos {
+  appearance: none;
+  background: var(--glass);
+  border: none;
+  border-radius: 9px;
+  color: var(--text-mid);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 6px 11px;
+  cursor: pointer;
+  min-width: 46px;
+  min-height: 34px;
+  text-align: center;
+  flex-shrink: 0;
+  box-shadow: var(--hairline);
+  transition: transform var(--t), color var(--t), box-shadow var(--t);
+}
+
+.alek-strip__pos:active { transform: translateY(1px) scale(0.96); color: var(--green-accent); box-shadow: var(--press); }
 
 .alek-strip__stats {
   font-size: 0.86rem;
@@ -762,17 +766,32 @@
 .summary-team--right { align-items: flex-end; text-align: right; }
 
 .summary-team__name {
-  font-size: 0.54rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.summary-team__score {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+.summary-team__name--hp { color: var(--green-accent); }
+
+.summary-team__total {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-team__total--hp { color: var(--green-accent); }
+
+.summary-team__gb {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.42);
+  font-variant-numeric: tabular-nums;
 }
 
 .summary-result-chip {
