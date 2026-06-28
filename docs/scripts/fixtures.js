@@ -201,12 +201,14 @@ function scoreRow(round, lang, state) {
   const chipClass = hpWon ? 'win' : oppWon ? 'loss' : 'draw';
   const oppName   = (opponent(round) || 'OPP').toUpperCase().substring(0, 11);
 
-  // Home team always renders on the LEFT.
+  // Home team always renders on the LEFT. Total score is dominant; the
+  // goals.behinds breakdown is secondary underneath.
+  const scoreValue = (t, isHp) => (t.goals === 0 && t.behinds === 0 && t.score === 0)
+    ? `<span class="score-team__total score-team__total--none">—</span>`
+    : `<span class="score-team__total${isHp ? ' score-team__total--hp' : ''}">${t.score}</span><span class="score-team__gb">${t.goals}.${t.behinds}</span>`;
   const isHome   = round.homeAway === 'home';
-  const hpBlock  = `<span class="score-team__name">HP BLUE</span>
-        <span class="score-team__value">${fmtScore(hp)}</span>`;
-  const oppBlock = `<span class="score-team__name">${oppName}</span>
-        <span class="score-team__value">${fmtScore(opp)}</span>`;
+  const hpBlock  = `<span class="score-team__name">HP BLUE</span>${scoreValue(hp, true)}`;
+  const oppBlock = `<span class="score-team__name">${oppName}</span>${scoreValue(opp, false)}`;
   const leftBlock  = isHome ? hpBlock : oppBlock;
   const rightBlock = isHome ? oppBlock : hpBlock;
 

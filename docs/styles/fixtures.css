@@ -247,10 +247,10 @@
 
 .fixtures-list {
   flex: 1;
-  padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  padding: 12px 12px calc(env(safe-area-inset-bottom, 0px) + 24px);
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 14px;
   overflow-y: auto;
 }
 
@@ -258,21 +258,26 @@
 
 .fixture-card {
   position: relative;
-  background: var(--glass);
+  background: rgba(255, 255, 255, 0.055);
   -webkit-backdrop-filter: var(--blur);
   backdrop-filter: var(--blur);
-  box-shadow: var(--hairline), var(--edge-top), var(--lift-sm);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    var(--edge-top),
+    0 8px 22px rgba(0, 0, 0, 0.42);
   border-radius: 16px;
-  padding: 13px 15px 11px;
+  padding: 14px 16px 12px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 
-/* Past: recede slightly, muted text */
+/* Past: recede slightly, muted text — but still clearly bounded */
 .fixture-card--past {
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow: var(--hairline);
+  background: rgba(255, 255, 255, 0.022);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 6px 16px rgba(0, 0, 0, 0.32);
 }
 
 .fixture-card--past .fixture-card__opponent,
@@ -504,18 +509,33 @@
 }
 
 .score-team__name {
-  font-size: 0.54rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
+  color: var(--text-mid);
+  margin-bottom: 3px;
 }
 
-.score-team__value {
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1;
+/* Total score dominant; goals.behinds secondary underneath */
+.score-team__total {
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+}
+
+.score-team__total--hp { color: var(--green-accent); }
+.score-team__total--none { color: var(--text-lo); font-weight: 700; }
+
+.score-team__gb {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-lo);
+  letter-spacing: 0.02em;
+  margin-top: 1px;
 }
 
 .score-mid {
