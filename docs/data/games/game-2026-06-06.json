@@ -1,0 +1,73 @@
+{
+  "round": 6,
+  "date": "2026-06-06",
+  "opponent": "Mundijong",
+  "homeAway": "home",
+  "quarters": [
+    {
+      "quarter": 1,
+      "position": null,
+      "mood": "motivated",
+      "notes": "Alek was on the bench this quarter. He can't wait to get in the game.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 0, "successful": 0 }
+      }
+    },
+    {
+      "quarter": 2,
+      "position": "def",
+      "mood": "motivated",
+      "notes": "He is fired up. Prevented a goal by touching the ball for a behind. Great mark of the ball in this quarter. He is holding the ball too long.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 7, "successful": 6 },
+        "tackles": { "attempts": 3, "successful": 2 }
+      }
+    },
+    {
+      "quarter": 3,
+      "position": "mid",
+      "mood": "motivated",
+      "notes": "Good energy in the midfield by Alek. Great tackling at the beginning but the team lost the energy in the second half of the quarter.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 2, "successful": 2 },
+        "tackles": { "attempts": 12, "successful": 7 }
+      }
+    },
+    {
+      "quarter": 4,
+      "position": "def",
+      "mood": "tired",
+      "notes": "Got injured at the end after a hard tackle.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 1, "successful": 0 },
+        "tackles": { "attempts": 3, "successful": 1 }
+      }
+    }
+  ],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 10, "successful": 8 },
+      "tackles": { "attempts": 18, "successful": 10 },
+      "points": 0
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 5, "behinds": 10, "score": 40 },
+      "opposition": { "goals": 8, "behinds": 8, "score": 56 }
+    }
+  },
+  "debrief": {
+    "didWell": "Great tackling and disposals. Great energy on this field. We did not lose today, we have been given a learning opportunity.",
+    "workOn": "He was holding the ball for too long in the first half of the game."
+  }
+}

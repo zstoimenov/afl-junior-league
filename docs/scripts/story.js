@@ -258,7 +258,9 @@ export async function renderReports(lang) {
 /* ---- stats rendering ---- */
 
 function xy(o) {
-  return `${o?.successful || 0}<span class="rstat__den">/${o?.attempts || 0}</span>`;
+  const att = o?.attempts || 0;
+  if (!att) return '—';  // not recorded (e.g. marks weren't tracked)
+  return `${o?.successful || 0}<span class="rstat__den">/${att}</span>`;
 }
 
 function statTile(ic, value, label) {
@@ -355,24 +357,33 @@ export async function renderReport(lang, date) {
 
   const statsHtml = game ? statsBlock(game, isEn, player) : '';
 
-  let narrativeHtml = '';
-  if (story) {
-    narrativeHtml = `
-      ${story.headline ? `<h2 class="story-title report-headline">${story.headline}</h2>` : ''}
-      ${story.commentator ? `
-      <div class="report-section">
-        <div class="report-section__label">${isEn ? 'The Call' : 'Репортаж'}</div>
-        <div class="story-text">${paragraphs(story.commentator)}</div>
-      </div>` : ''}
-      ${story.coach ? `
+  // Commentator comes from the story file; coach notes use the written story
+  // coach if present, otherwise the game's own debrief (didWell / workOn).
+  const commentator = story?.commentator;
+  const headline    = story?.headline;
+  const debrief     = game?.debrief || {};
+
+  const headlineHtml = headline ? `<h2 class="story-title report-headline">${headline}</h2>` : '';
+
+  const commentaryHtml = commentator ? `
+    <div class="report-section">
+      <div class="report-section__label">${isEn ? 'The Call' : 'Репортаж'}</div>
+      <div class="story-text">${paragraphs(commentator)}</div>
+    </div>` : '';
+
+  let coachHtml = '';
+  if (story?.coach) {
+    coachHtml = `
       <div class="report-section">
         <div class="report-section__label">${isEn ? "Coach's Notes" : 'Бележки от треньора'}</div>
         <div class="story-text">${paragraphs(story.coach)}</div>
-      </div>` : ''}`;
-  } else if (game) {
-    narrativeHtml = `
+      </div>`;
+  } else if (debrief.didWell || debrief.workOn) {
+    coachHtml = `
       <div class="report-section">
-        <div class="report-soon">${isEn ? 'The match story is coming soon.' : 'Историята на мача предстои.'}</div>
+        <div class="report-section__label">${isEn ? "Coach's Notes" : 'Бележки от треньора'}</div>
+        ${debrief.didWell ? `<div class="coach-line"><span class="coach-line__tag coach-line__tag--good">${isEn ? 'Did well' : 'Силни страни'}</span><span>${debrief.didWell}</span></div>` : ''}
+        ${debrief.workOn ? `<div class="coach-line"><span class="coach-line__tag coach-line__tag--work">${isEn ? 'Work on' : 'За подобрение'}</span><span>${debrief.workOn}</span></div>` : ''}
       </div>`;
   }
 
@@ -380,6 +391,8 @@ export async function renderReport(lang, date) {
     <div class="story-content">
       <div class="report-meta">${round ? `${isEn ? 'Round' : 'Кръг'} ${round} · ` : ''}${date}</div>
       ${statsHtml}
-      ${narrativeHtml}
+      ${headlineHtml}
+      ${commentaryHtml}
+      ${coachHtml}
     </div>`;
 }

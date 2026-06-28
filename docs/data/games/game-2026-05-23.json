@@ -1,0 +1,73 @@
+{
+  "round": 5,
+  "date": "2026-05-23",
+  "opponent": "HPFC Green",
+  "homeAway": "away",
+  "quarters": [
+    {
+      "quarter": 1,
+      "position": null,
+      "mood": null,
+      "notes": "On the bench this quarter.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 0, "successful": 0 }
+      }
+    },
+    {
+      "quarter": 2,
+      "position": "mid",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 1, "goalAttempts": 1 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 6, "successful": 5 },
+        "tackles": { "attempts": 4, "successful": 4 }
+      }
+    },
+    {
+      "quarter": 3,
+      "position": "def",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 4, "successful": 3 },
+        "tackles": { "attempts": 1, "successful": 1 }
+      }
+    },
+    {
+      "quarter": 4,
+      "position": "fwd",
+      "mood": null,
+      "notes": "",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 1, "successful": 1 }
+      }
+    }
+  ],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 0, "behinds": 1, "goalAttempts": 1 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 10, "successful": 8 },
+      "tackles": { "attempts": 6, "successful": 6 },
+      "points": 1
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 8, "behinds": 3, "score": 51 },
+      "opposition": { "goals": 6, "behinds": 4, "score": 40 }
+    }
+  },
+  "debrief": {
+    "didWell": "He was on the bench in Q1. He came in at Q2 and gave his team the energy they needed. Great tackling and disposal accuracy.",
+    "workOn": "Pass the ball in front of the goal. Also run into space to give your teammates options to pass. Stay engaged in the game."
+  }
+}

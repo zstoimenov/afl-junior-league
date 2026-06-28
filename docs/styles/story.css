@@ -194,6 +194,32 @@
 
 .report-headline { margin-top: 22px; }
 
+.coach-line {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.coach-line:last-child { margin-bottom: 0; }
+
+.coach-line__tag {
+  flex-shrink: 0;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-top: 2px;
+}
+
+.coach-line__tag--good { color: var(--green-accent); background: rgba(34, 197, 94, 0.12); box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.3); }
+.coach-line__tag--work { color: #eab308; background: rgba(234, 179, 8, 0.12); box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.28); }
+
 .report-soon {
   font-size: 0.92rem;
   color: var(--text-mid);

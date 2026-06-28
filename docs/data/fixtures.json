@@ -64,7 +64,7 @@
       "homeTeam": "Hammond Park Green",
       "awayTeam": "Hammond Park Blue",
       "ground": "Frankland Park",
-      "homeAway": "home",
+      "homeAway": "away",
       "result": {
         "hammondPark": { "goals": 8, "behinds": 3, "score": 51 },
         "opposition": { "goals": 6, "behinds": 4, "score": 40 },

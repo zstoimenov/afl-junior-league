@@ -1,0 +1,73 @@
+{
+  "round": 7,
+  "date": "2026-06-13",
+  "opponent": "Roleystone",
+  "homeAway": "away",
+  "quarters": [
+    {
+      "quarter": 1,
+      "position": "def",
+      "mood": "neutral",
+      "notes": "Came in from the bench. Played 6 minutes but very strong performance.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 1, "successful": 1 },
+        "tackles": { "attempts": 1, "successful": 1 }
+      }
+    },
+    {
+      "quarter": 2,
+      "position": "mid",
+      "mood": "neutral",
+      "notes": "Good presence in the middle of the field. Good pressure on the opposition.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 3, "successful": 3 },
+        "tackles": { "attempts": 2, "successful": 2 }
+      }
+    },
+    {
+      "quarter": 3,
+      "position": "fwd",
+      "mood": "neutral",
+      "notes": "Great mark on the goal line. Unfortunately, did not score on his more uncomfortable side. Scored a great goal. Great marks in front of the goal.",
+      "aleksStats": {
+        "scoring": { "goals": 1, "behinds": 1, "goalAttempts": 3 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 2, "successful": 1 }
+      }
+    },
+    {
+      "quarter": 4,
+      "position": "def",
+      "mood": "neutral",
+      "notes": "He got substituted 6 minutes before the end. Solid performance.",
+      "aleksStats": {
+        "scoring": { "goals": 0, "behinds": 0, "goalAttempts": 0 },
+        "marks": { "attempts": 0, "successful": 0 },
+        "disposals": { "attempts": 0, "successful": 0 },
+        "tackles": { "attempts": 3, "successful": 2 }
+      }
+    }
+  ],
+  "totals": {
+    "aleksStats": {
+      "scoring": { "goals": 1, "behinds": 1, "goalAttempts": 3 },
+      "marks": { "attempts": 0, "successful": 0 },
+      "disposals": { "attempts": 4, "successful": 4 },
+      "tackles": { "attempts": 8, "successful": 6 },
+      "points": 7
+    },
+    "teamScore": {
+      "hammondPark": { "goals": 13, "behinds": 20, "score": 98 },
+      "opposition": { "goals": 2, "behinds": 4, "score": 16 }
+    }
+  },
+  "debrief": {
+    "didWell": "Solid performance even though there was a clear mismatch in the quality of the teams. Good coverage of the opposite team player. Great marks in front of the opposition goal to create opportunities for shots.",
+    "workOn": "Need to keep practising his shot accuracy."
+  }
+}
