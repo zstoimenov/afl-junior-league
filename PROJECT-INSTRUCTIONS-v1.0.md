@@ -2,7 +2,7 @@
 
 ## Product Vision
 
-A self-contained PWA that tracks an AFL Kids League player's game stats, generates rich match stories, and shares them with family. The stats are fuel for the narrative. The goal is for a 9-year-old named Alek to feel like a professional AFL player after every game.
+A self-contained PWA that tracks an AFL Kids League player's game stats, generates rich match stories, and shares them with family. The stats are fuel for the narrative. The goal is for a young player named Alek (8 in 2026 — age comes from `season-config.json` and rolls forward each season) to feel like a professional AFL player after every game.
 
 **Core emotional outcome:** After every game, Alek reads a personalised match report that makes him feel like he's reading about himself in The Age sports section.
 
@@ -13,7 +13,7 @@ A self-contained PWA that tracks an AFL Kids League player's game stats, generat
 | Person | Role | Language | Access |
 |---|---|---|---|
 | Zak (dad) | Designer, stat logger, primary user | English | Tracker password |
-| Alek | 9-year-old player, report reader | English | Set up by Zak |
+| Alek | Player, report reader (8 in 2026; age from `season-config.json`) | English | Set up by Zak |
 | Family / Grandparents | Fans following from Bulgaria | Bulgarian | Family password |
 
 **About Alek:**
@@ -121,6 +121,7 @@ Landing page with two large flag buttons. No password at this level.
   "player": {
     "name": "Alek",
     "number": 13,
+    "birthYear": 2018,
     "nicknames": [],
     "shoeColour": ""
   },
@@ -375,7 +376,7 @@ When generating a story, Claude will receive a structured JSON block containing:
 - Reference quarter mood where it adds colour
 - English commentator voice: energetic, specific, AFL broadcast style
 - Bulgarian voice: warm, narrative, written for a proud grandparent
-- Coach notes: constructive, encouraging, never harsh for a 9-year-old
+- Coach notes: constructive, encouraging, never harsh for a child his age
 
 ### Season Arc (On Demand)
 

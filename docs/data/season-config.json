@@ -6,6 +6,7 @@
   "player": {
     "name": "Alek",
     "number": 13,
+    "birthYear": 2018,
     "nicknames": [],
     "shoeColour": "orange"
   },

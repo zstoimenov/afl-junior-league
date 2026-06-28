@@ -152,7 +152,7 @@ function cardBg(round, state) {
   const ha = round.homeAway;
 
   const haChip = ha
-    ? `<span class="ha-chip ha-chip--${ha}">${ha === 'home' ? 'У ДОМА' : 'НА ГОСТИ'}</span>`
+    ? `<span class="ha-chip ha-chip--${ha}">${ha === 'home' ? 'ДОМАКИН' : 'ГОСТ'}</span>`
     : '';
 
   const todayPill = state === 'today' ? `<span class="today-dot">ДНЕС</span>` : '';
