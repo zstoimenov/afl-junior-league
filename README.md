@@ -32,7 +32,10 @@ Personal AFL Kids League stat tracker and storytelling platform for Hammond Park
 │       │   ├── index.json         # Lists which dates have a saved game file
 │       │   └── game-YYYY-MM-DD.json  # Saved after each game (source of truth for results)
 │       └── stories/
-│           └── 2026.json          # BG stories: prologue + chapters 1–9
+│           ├── index.json         # Lists which dates have a per-game story file
+│           ├── GENERATION.md      # How Claude turns a game JSON into a story
+│           ├── 2026.json          # BG season narrative: prologue + chapters
+│           └── story-YYYY-MM-DD.json  # Per-game report (EN+BG: headline/commentator/coach)
 ├── data/                          # Schema reference files
 │   ├── season-config.json
 │   ├── fixtures.json
@@ -153,18 +156,20 @@ The tracker saves game JSON via clipboard → GitHub Mobile paste. Saved game fi
 
 ---
 
-### Phase 6 — Match Reports & Story Generation 🔲 Not started
+### Phase 6 — Match Reports & Story Generation 🚧 In progress
 
 Claude generates stories from game JSON. Stories are saved once and never regenerated unless explicitly requested.
 
 | Task | Status |
 |---|---|
-| Story generation prompt: Claude receives game JSON → outputs EN + BG story JSON | 🔲 Todo |
-| EN story format: headline + Fox Footy commentator + coach notes | 🔲 Todo |
-| BG story format: warm grandparent-tone narrative (2–3 rich paragraphs) | 🔲 Todo |
-| Story saved to `docs/data/stories/story-YYYY-MM-DD.json` | 🔲 Todo |
-| EN Match Reports screen (Alek-facing, kid-friendly) | 🔲 Todo |
-| BG Game Stories screen updated to read from per-game story JSON files | 🔲 Todo |
+| Story generation prompt / process documented | ✅ Done — `docs/data/stories/GENERATION.md` (inputs, output, 3–5 min length, tone, guardrails) |
+| EN story format: headline + Fox Footy commentator + coach notes | ✅ Done — per-game `story-YYYY-MM-DD.json` schema |
+| BG story format: warm grandparent-tone narrative | ✅ Done — same per-game schema (`bulgarian.*`); season narrative bundle also retained |
+| Story saved to `docs/data/stories/story-YYYY-MM-DD.json` + `index.json` | ✅ Format + manifest ready (`stories/index.json`); files added per game |
+| EN Match Reports screen (Alek-facing) | ✅ Done — list + reader (`#/en/reports`, `#/en/report/{date}`), tasteful empty state |
+| Existing BG chapters expanded to 3–5 minute reads | 🚧 In progress — prologue + early chapters done; rest rolling forward |
+
+> **Two story shapes, by design:** the **BG Game Stories** are the warm season-narrative chapters (the `2026.json` bundle, read via the season picker) — kept because they make the best long-form grandparent read. The **per-game `story-YYYY-MM-DD.json`** format (headline / commentator / coach, EN + BG) drives the new **Match Reports** screen and any future generated stories. The BG narrative bundle is not being force-migrated into per-game files.
 
 ---
 
@@ -232,6 +237,14 @@ A running summary of what's been built. Newest at the bottom.
 - Shared **`scripts/config.js`** is now the single source of truth for identity — player name/number (tracker) and full team name (Fixtures + Story headers) read from `season-config.json`.
 - Tracker summary now reminds you to add the date to `games/index.json` after pasting a game file.
 - Home/away colour shift from the original spec is intentionally **not** implemented — superseded by the deliberate neutral palette.
+
+### Subtle home/away accent
+- Green = home, soft steel = away, applied as a thin left stripe on each fixture card, the AWAY chip, and (on the tracker) the HP HOME/AWAY label + a small tab over the scoreboard. The main score stays green so our team reads instantly.
+
+### Phase 6 — Match Reports & story generation (in progress)
+- New **English Match Reports** screen (list + reader) reading per-game `story-YYYY-MM-DD.json`; tasteful empty state until games are saved. Added to the EN menu.
+- Per-game story format (EN + BG: headline / commentator / coach) + `stories/index.json` manifest + `GENERATION.md` documenting the process and the **3–5 minute** length target.
+- **Story length:** the prologue + chapters 1–3 of the 2026 BG season have been rewritten as richer reads (roughly doubled, ~2.5–3.5 min); chapters 4–9 still to be expanded/lengthened to the full target.
 
 ---
 
