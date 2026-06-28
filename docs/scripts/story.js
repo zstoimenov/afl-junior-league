@@ -348,6 +348,83 @@ function statsBlock(game, isEn, player) {
     </div>` : ''}`;
 }
 
+// Score timeline — a margin "worm" of cumulative HP minus opposition points
+// across the game. Positive (above the line, green) = Hammond Park ahead;
+// negative (below, red) = behind. Vertical lines mark the quarter breaks.
+// Only rendered when the game carries a timestamped `events` stream.
+function timelineGraph(game, isEn) {
+  const events = (game.events || []).filter(
+    e => (e.points || 0) > 0 && (e.team === 'hammondPark' || e.team === 'opposition')
+  );
+  if (!events.length) return '';
+
+  const qDur  = game.quarterDuration || 900;
+  const numQ  = Math.max(4, game.quarters?.length || 0, ...events.map(e => e.quarter || 1));
+  const totalT = numQ * qDur;
+
+  const W = 320, H = 132, padY = 16;
+  const cy = H / 2;
+  const evX = e => (((e.quarter || 1) - 1) * qDur) + Math.min(e.time || 0, qDur);
+
+  const sorted = events.slice().sort((a, b) => evX(a) - evX(b));
+  let hpC = 0, opC = 0, maxAbs = 6;
+  const pts = [{ x: 0, m: 0 }];
+  sorted.forEach(e => {
+    const x = evX(e);
+    pts.push({ x, m: hpC - opC });                       // hold at the previous margin
+    if (e.team === 'hammondPark') hpC += e.points; else opC += e.points;
+    pts.push({ x, m: hpC - opC });                       // step to the new margin
+    maxAbs = Math.max(maxAbs, Math.abs(hpC - opC));
+  });
+  pts.push({ x: totalT, m: hpC - opC });
+
+  const sx = x => (x / totalT) * W;
+  const sy = m => cy - (m / maxAbs) * (cy - padY);
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${sx(p.x).toFixed(1)} ${sy(p.m).toFixed(1)}`).join(' ');
+  const area = `${line} L${W} ${cy} L0 ${cy} Z`;
+
+  const seps = [];
+  for (let q = 1; q < numQ; q++) {
+    const x = sx(q * qDur).toFixed(1);
+    seps.push(`<line x1="${x}" y1="0" x2="${x}" y2="${H}" class="tl__sep"/>`);
+  }
+
+  const qLabels = Array.from({ length: numQ }, (_, i) =>
+    `<span class="tl-axis__q">Q${i + 1}</span>`).join('');
+
+  const margin = hpC - opC;
+  const lead = margin > 0
+    ? (isEn ? `HP ahead by ${margin}` : `HP води с ${margin}`)
+    : margin < 0
+      ? (isEn ? `HP behind by ${-margin}` : `HP изостава с ${-margin}`)
+      : (isEn ? 'Scores level' : 'Равенство');
+
+  return `
+    <div class="report-section">
+      <div class="report-section__label">${isEn ? 'Score timeline' : 'Хронология на точките'}</div>
+      <div class="tl-wrap">
+        <svg class="tl" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"
+             aria-label="${isEn ? 'Score margin over the game' : 'Разлика в точките през мача'}">
+          <defs>
+            <clipPath id="tl-up"><rect x="0" y="0" width="${W}" height="${cy}"/></clipPath>
+            <clipPath id="tl-dn"><rect x="0" y="${cy}" width="${W}" height="${H - cy}"/></clipPath>
+          </defs>
+          ${seps.join('')}
+          <path d="${area}" class="tl__area tl__area--hp"  clip-path="url(#tl-up)"/>
+          <path d="${area}" class="tl__area tl__area--opp" clip-path="url(#tl-dn)"/>
+          <line x1="0" y1="${cy}" x2="${W}" y2="${cy}" class="tl__zero"/>
+          <path d="${line}" class="tl__worm"/>
+        </svg>
+        <div class="tl-axis">${qLabels}</div>
+        <div class="tl-legend">
+          <span class="tl-legend__item"><span class="tl-legend__swatch tl-legend__swatch--hp"></span>${isEn ? 'Hammond Park' : 'Hammond Park'}</span>
+          <span class="tl-legend__item"><span class="tl-legend__swatch tl-legend__swatch--opp"></span>${isEn ? 'Opposition' : 'Съперник'}</span>
+          <span class="tl-legend__lead">${lead}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
 // A single game: stats + commentator + coach.
 export async function renderReport(lang, date) {
   const isEn = lang === 'en';
@@ -365,7 +442,8 @@ export async function renderReport(lang, date) {
   const story = isEn ? s?.english : s?.bulgarian;
   const round = s?.round ?? game?.round ?? '';
 
-  const statsHtml = game ? statsBlock(game, isEn, player) : '';
+  const statsHtml    = game ? statsBlock(game, isEn, player) : '';
+  const timelineHtml = game ? timelineGraph(game, isEn) : '';
 
   // Commentator comes from the story file; coach notes use the written story
   // coach if present, otherwise the game's own debrief (didWell / workOn).
@@ -401,6 +479,7 @@ export async function renderReport(lang, date) {
     <div class="story-content">
       <div class="report-meta">${round ? `${isEn ? 'Round' : 'Кръг'} ${round} · ` : ''}${date}</div>
       ${statsHtml}
+      ${timelineHtml}
       ${coachHtml}
       ${headlineHtml}
       ${commentaryHtml}
