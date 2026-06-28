@@ -59,9 +59,17 @@ Reports screen lists it.
 
 - No templates or a pre-written message library — each story fresh and specific.
 - Vary the structure and the opening every week.
-- Reference the established colour: #13, the orange boots, Hammond Park Blue,
-  Frankland Park (home).
+- Reference the established colour: #13, the orange boots, Frankland Park (home).
 - Stay true to the facts in the game JSON — invent atmosphere, not events.
+
+### Two facts to always get right
+
+- **Age** — read Alek's age from `season-config.json`: `season − player.birthYear`
+  (2026 → 8, 2027 → 9, …). Never hardcode it; use the season's correct age.
+- **Kit colours** — every Hammond Park team plays in the **club** colours:
+  **green/white at home, white/green away**. The team is named *Hammond Park
+  Blue* (BG: *Сините* / "the Blues"), but they do **not** wear blue. Keep the
+  name; never dress them in blue. The orange boots are Alek's, not the kit.
 
 ## Season arc (Phase 7, on demand)
 
