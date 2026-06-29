@@ -245,17 +245,22 @@ function posClass(pos) {
 // clipping. Both sides share a fixed box height so the scores stay aligned.
 function fitTeamName(el) {
   if (!el) return;
+  // Measure the inner text span, not the box: on the right (away) side the box
+  // is justify-content:flex-end, and a flex container's scrollWidth doesn't
+  // report text overflowing past its start edge — so measuring the box would
+  // never detect an over-long away name. The span reports its true width.
+  const txt = el.firstElementChild || el;
   const MAX = 1.6, MIN = 0.82, STEP = 0.04;
   let size = MAX;
-  el.style.whiteSpace = 'nowrap';
-  el.style.fontSize = size + 'rem';
+  txt.style.whiteSpace = 'nowrap';
+  txt.style.fontSize = size + 'rem';
   let guard = 30;
-  while (el.scrollWidth > el.clientWidth && size > MIN && guard-- > 0) {
+  while (txt.scrollWidth > el.clientWidth && size > MIN && guard-- > 0) {
     size -= STEP;
-    el.style.fontSize = size + 'rem';
+    txt.style.fontSize = size + 'rem';
   }
   // Still too wide even at the smallest size → allow a second line.
-  if (el.scrollWidth > el.clientWidth) el.style.whiteSpace = 'normal';
+  if (txt.scrollWidth > el.clientWidth) txt.style.whiteSpace = 'normal';
 }
 
 function fitTeamNames() {
@@ -987,7 +992,7 @@ export async function renderTracker(lang, round) {
   const hpSide = `
     <div class="scoreboard__side scoreboard__side--hp scoreboard__side--${isHome ? 'left' : 'right'}">
       <div class="scoreboard__ha">${hpHA}</div>
-      <div class="scoreboard__name">Hammond Park Blue</div>
+      <div class="scoreboard__name"><span class="scoreboard__name-txt">Hammond Park Blue</span></div>
       <button class="scoreboard__btn scoreboard__btn--hp" id="score-hp-btn">
         <div class="scoreboard__pts" id="hp-pts">${calcTotal(G.score.hp)}</div>
         <div class="scoreboard__gb"  id="hp-gb">${fmtGB(G.score.hp)}</div>
@@ -997,7 +1002,7 @@ export async function renderTracker(lang, round) {
   const oppSide = `
     <div class="scoreboard__side scoreboard__side--opp scoreboard__side--${isHome ? 'right' : 'left'}">
       <div class="scoreboard__ha">${oppHA}</div>
-      <div class="scoreboard__name" id="opp-name">${oppName}</div>
+      <div class="scoreboard__name" id="opp-name"><span class="scoreboard__name-txt">${oppName}</span></div>
       <button class="scoreboard__btn" id="score-opp-btn">
         <div class="scoreboard__pts" id="opp-pts">${calcTotal(G.score.opp)}</div>
         <div class="scoreboard__gb"  id="opp-gb">${fmtGB(G.score.opp)}</div>

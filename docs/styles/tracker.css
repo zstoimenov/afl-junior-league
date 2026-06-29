@@ -317,6 +317,13 @@
 
 .scoreboard__side--right .scoreboard__name { text-align: right; justify-content: flex-end; }
 
+/* Inner span carries the font-size JS sets (and is what JS measures); it may
+   wrap to a second line when the smallest size still doesn't fit. */
+.scoreboard__name-txt {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 .scoreboard__side--hp .scoreboard__name { color: var(--green-accent); }
 
 .scoreboard__btn {
