@@ -7,7 +7,9 @@
     "name": "Alek",
     "number": 13,
     "birthYear": 2018,
-    "nicknames": [],
+    "nicknames": [
+      “The tackling machine”,
+    ],
     "shoeColour": "orange"
   },
   "colours": {
